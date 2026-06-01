@@ -26,4 +26,33 @@ public class TrackTest {
         assertEquals("Nuovo Titolo", track.getTitle());
         assertEquals(2023, track.getReleaseYear());
     }
+
+    //Verifica del funzionamento di addTrack()
+    @Test
+    public void testLibraryAddTrack() {
+        Library library = new Library();
+        library.loadSampleData();
+        int sizeIniziale = library.getAllTracks().size();
+
+        library.addTrack(track); // Aggiunge la traccia di test "Titolo Test"
+
+        assertEquals(sizeIniziale + 1, library.getAllTracks().size());
+        assertTrue(library.getAllTracks().contains(track));
+    }
+
+    //Verifica del funzionamento di removeTrack()
+    @Test
+    public void testLibraryRemoveTrack() {
+        Library library = new Library();
+        library.loadSampleData();
+        library.addTrack(track); 
+        
+        int sizePrimaDellaRimozione = library.getAllTracks().size();
+
+        library.removeTrack(track); // Testiamo la rimozione
+
+        assertEquals(sizePrimaDellaRimozione - 1, library.getAllTracks().size());
+        assertFalse(library.getAllTracks().contains(track));
+    }
+
 }

@@ -10,6 +10,7 @@ public class Library {
     }
 
     public void addTrack(Track t) { tracks.add(t); }
+    public void removeTrack(Track t) { tracks.remove(t); }
     public javafx.collections.ObservableList<Track> getAllTracks() { return tracks; }
 
 

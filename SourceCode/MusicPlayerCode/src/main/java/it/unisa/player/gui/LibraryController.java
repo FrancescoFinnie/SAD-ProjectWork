@@ -58,6 +58,35 @@ public class LibraryController {
      * Configura le logiche di interazione all'interno della tabella (Cestino e Doppio Click).
      */
     private void setupTableInteractions() {
+        // Gestione della colonna di cancellazione 
+        if (deleteColumn != null) {
+            deleteColumn.setCellFactory(param -> new TableCell<Track, Void>() {
+                private final Button deleteBtn = new Button("✕"); 
+                {
+                    //Stile del pulsante 
+                    deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff3b30; -fx-font-weight: bold; -fx-font-size: 14; -fx-cursor: hand; -fx-padding: 0 10 0 0;");
+                    //Gestione dell'evento di click sul pulsante di cancellazione
+                    deleteBtn.setOnAction(event -> {
+                        Track track = getTableView().getItems().get(getIndex());
+                        
+                        if (LibraryController.this.library != null) {
+                            LibraryController.this.library.removeTrack(track);
+                            System.out.println("Traccia eliminata: " + track.getTitle());
+                        }
+                    });
+                }
+                //se la riga è vuota, non mostriamo il pulsante
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(deleteBtn);
+                    }
+                }
+            });
+        }
         //Gestione del doppio click sulla riga per modificare la traccia
         if (trackTable != null) {
             trackTable.setOnMouseClicked(event -> {

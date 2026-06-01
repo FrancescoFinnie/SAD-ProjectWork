@@ -9,6 +9,7 @@ public class Library {
         this.tracks = javafx.collections.FXCollections.observableArrayList();
     }
 
+    public void addTrack(Track t) { tracks.add(t); }
     public javafx.collections.ObservableList<Track> getAllTracks() { return tracks; }
 
 

@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 public class PlaylistController {
 
-    // Cambiato da ListView a TableView e TableColumn
+    
     @FXML private TableView<Playlist> playlistTable;
     @FXML private TableColumn<Playlist, String> nameColumn;
     
@@ -27,6 +27,49 @@ public class PlaylistController {
         // Collega la colonna "Nome" all'attributo "name" della classe Playlist
         if (nameColumn != null) {
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        }
+
+        // --- Doppio click per aprire il dettaglio della playlist---
+        if (playlistTable != null) {
+            playlistTable.setRowFactory(tv -> {
+                javafx.scene.control.TableRow<Playlist> row = new javafx.scene.control.TableRow<>();
+                row.setOnMouseClicked(event -> {
+                    // Controlla che la riga non sia vuota e che l'utente abbia fatto esattamente 2 click
+                    if (!row.isEmpty() && event.getClickCount() == 2) {
+                        Playlist clickedPlaylist = row.getItem();
+                        openPlaylistDetail(clickedPlaylist);
+                    }
+                });
+                return row;
+            });
+        }
+
+    }
+
+
+    /**
+     * Esegue il cambio scena verso la vista di dettaglio della playlist (US13).
+     * @param targetPlaylist La playlist su cui l'utente ha fatto doppio click.
+     */
+    private void openPlaylistDetail(Playlist targetPlaylist) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/PlaylistDetailView.fxml"));
+            javafx.scene.Parent root = loader.load();
+            
+            // Recuperiamo il controller della nuova vista
+            PlaylistDetailController detailController = loader.getController();
+            if (detailController != null) {
+                // Passiamo la libreria, la singola playlist cliccata e lo stage
+                detailController.setDependencies(this.library, targetPlaylist, this.primaryStage);
+            }
+            
+            // Effettuiamo il cambio di scena
+            if (primaryStage != null && primaryStage.getScene() != null) {
+                primaryStage.getScene().setRoot(root);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Errore nell'apertura della vista di dettaglio della playlist.");
         }
     }
 

@@ -71,4 +71,45 @@ public class PlaylistDetailController {
             System.err.println("Errore nel ritorno alla vista Playlist.");
         }
     }
+
+    /**
+     * Intercetta il click sul pulsante "+" della UI.
+     * Il suo scopo è fermare temporaneamente l'interazione con la schermata corrente 
+     * e aprire in sovrimpressione la vista modale per selezionare un nuovo brano.
+     */
+    @FXML
+    public void onAddTrackClick() {
+        try {
+            // 1. Caricamento del file FXML che definisce l'aspetto visivo del Popup
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/SelectTrack.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            // 2. Creazione e configurazione della finestra modale (Popup)
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Seleziona Brano dalla Libreria");
+            
+            // APPLICATION_MODAL impedisce all'utente di cliccare sulla finestra principale sottostante
+            // finché il popup di selezione non viene chiuso o completato.
+            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL); 
+            dialogStage.initOwner(primaryStage);
+            dialogStage.setScene(new javafx.scene.Scene(root));
+
+            // 3. Iniezione delle Dipendenze (Dependency Injection)
+            // Recuperiamo il controller appena istanziato dal loader e gli passiamo il "motore" (Library)
+            // e la "destinazione" (currentPlaylist) su cui dovrà applicare l'aggiunta del brano.
+            SelectTrackController controller = loader.getController();
+            if (controller != null) {
+                controller.setDependencies(this.library, this.currentPlaylist, dialogStage);
+            }
+
+            // 4. Mostra la finestra a schermo e sospende l'esecuzione di questo metodo
+            // finché il dialogStage non viene chiuso dall'utente (tramite i tasti Aggiungi o Annulla).
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            // Gestione di sicurezza in caso di file FXML mancante o errori di inizializzazione
+            e.printStackTrace();
+            System.err.println("Errore critico: Impossibile caricare l'interfaccia SelectTrack.fxml.");
+        }
+    }
 }

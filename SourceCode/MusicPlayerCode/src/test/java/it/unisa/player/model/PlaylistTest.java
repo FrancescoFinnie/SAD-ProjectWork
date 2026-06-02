@@ -48,4 +48,17 @@ public class PlaylistTest {
         assertEquals(1, p.getTracks().size(), "La lista deve contenere esattamente 1 traccia");
         assertEquals(t, p.getTracks().get(0), "La traccia deve essere quella inserita");
     }
+
+    @Test
+    public void testAddTrackWithoutDuplicates() {
+        Playlist p = new Playlist("Playlist Test");
+        Track t1 = new Track("Brano 1", "Autore 1", 200, "Pop", 2020);
+        Track t2 = new Track("brano 1", "AUTORE 1", 200, "Pop", 2020); // Duplicato logico
+        Track t3 = new Track("Brano 2", "Autore 2", 210, "Rock", 2021);
+
+        assertTrue(p.addTrack(t1), "La prima traccia deve essere inserita");
+        assertFalse(p.addTrack(t2), "Il sistema deve bloccare il duplicato");
+        assertTrue(p.addTrack(t3), "La terza traccia deve essere inserita");
+        assertEquals(2, p.getTracks().size(), "La playlist deve contenere esattamente 2 brani");
+    }
 }

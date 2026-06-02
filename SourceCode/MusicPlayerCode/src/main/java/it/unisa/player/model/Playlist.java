@@ -21,4 +21,18 @@ public class Playlist {
     public ObservableList<Track> getTracks() { 
         return tracks; 
     }
+
+    public boolean addTrack(Track t) {
+        if (t == null) return false;
+
+        for (Track existing : tracks) {
+            if (existing.getTitle().equalsIgnoreCase(t.getTitle()) &&
+                existing.getAuthor().equalsIgnoreCase(t.getAuthor())) {
+                return false; // Blocco l'inserimento
+            }
+        }
+        
+        tracks.add(t);
+        return true;
+    }
 }

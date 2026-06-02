@@ -1,14 +1,28 @@
 package it.unisa.player.gui;
 
+import java.util.Optional;
+
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Playlist;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+
+
+//import per remove
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import java.util.Optional;
 
 public class PlaylistController {
 
@@ -27,6 +41,55 @@ public class PlaylistController {
         // Collega la colonna "Nome" all'attributo "name" della classe Playlist
         if (nameColumn != null) {
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        }
+
+        // 2. Configura la colonna del cestino con UI Consistency
+        if (deleteColumn != null) {
+            deleteColumn.setCellFactory(param -> new TableCell<Playlist, Void>() {
+                
+                // Usiamo la stessa "✕" usata nel LibraryController
+                private final Button deleteBtn = new Button("✕"); 
+
+                {
+                    // Stile clonato al millimetro dal LibraryController
+                    deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff3b30; -fx-font-weight: bold; -fx-font-size: 14; -fx-cursor: hand; -fx-padding: 0 10 0 0;");
+                    
+                    // Azione al click
+                    deleteBtn.setOnAction(event -> {
+                        Playlist playlist = getTableView().getItems().get(getIndex());
+                        
+                        // Creazione dell'Alert di conferma (Requisito Task 12.2)
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Conferma Eliminazione");
+                        alert.setHeaderText("Eliminazione Playlist");
+                        alert.setContentText("Sei sicuro di voler eliminare la playlist '" + playlist.getName() + "'?");
+
+                        // Mostra l'alert e aspetta la risposta dell'utente
+                        Optional<ButtonType> result = alert.showAndWait();
+                        
+                        if (result.isPresent() && result.get() == ButtonType.OK) {
+                            if (library != null) {
+                                // Rimuove l'oggetto dal Model
+                                library.removePlaylist(playlist);
+                                System.out.println("Playlist eliminata: " + playlist.getName());
+                                
+                                // NOTA IMPORTANTE: Non chiamiamo nessun refreshTable() qui!
+                                // Poiché usiamo una ObservableList, la UI si aggiorna da sola.
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(deleteBtn);
+                    }
+                }
+            });
         }
 
         // --- Doppio click per aprire il dettaglio della playlist---

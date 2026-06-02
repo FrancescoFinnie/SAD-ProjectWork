@@ -1,0 +1,12 @@
+it\unisa\player\gui\PlaylistController.class
+it\unisa\player\gui\LibraryController.class
+it\unisa\player\gui\TrackFormController.class
+it\unisa\player\model\Playlist.class
+it\unisa\player\gui\App.class
+it\unisa\player\model\Track.class
+it\unisa\player\gui\LibraryController$1.class
+it\unisa\player\gui\PlaylistFormController.class
+module-info.class
+it\unisa\player\model\Library.class
+it\unisa\player\gui\PlaylistDetailController.class
+it\unisa\player\gui\PlaylistController$1.class

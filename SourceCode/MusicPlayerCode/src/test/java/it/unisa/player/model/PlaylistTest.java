@@ -61,4 +61,23 @@ public class PlaylistTest {
         assertTrue(p.addTrack(t3), "La terza traccia deve essere inserita");
         assertEquals(2, p.getTracks().size(), "La playlist deve contenere esattamente 2 brani");
     }
+
+    @Test
+    public void testRemoveTrack() {
+        Playlist p = new Playlist("Playlist Relax");
+        Track t1 = new Track("Brano 1", "Autore 1", 200, "Pop", 2020);
+        Track t2 = new Track("Brano 2", "Autore 2", 210, "Rock", 2021);
+
+        // Setup: aggiungiamo due tracce
+        p.addTrack(t1);
+        p.addTrack(t2);
+
+        // 1. Verifica rimozione traccia esistente
+        assertTrue(p.removeTrack(t1), "La rimozione di una traccia esistente deve restituire true");
+        assertEquals(1, p.getTracks().size(), "La playlist deve contenere ora esattamente 1 brano");
+        assertFalse(p.getTracks().contains(t1), "La traccia rimossa non deve più essere nella lista");
+
+        // 2. Verifica rimozione di una traccia non presente (o già rimossa)
+        assertFalse(p.removeTrack(t1), "La rimozione di una traccia non presente deve restituire false");
+    }
 }

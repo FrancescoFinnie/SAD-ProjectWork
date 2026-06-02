@@ -18,15 +18,59 @@ public class PlaylistDetailController {
     @FXML private TableView<Track> trackTable;
     @FXML private TableColumn<Track, String> titleColumn;
     @FXML private TableColumn<Track, String> authorColumn;
+    @FXML private TableColumn<Track, Void> deleteColumn;
 
     private Library library;
     private Playlist currentPlaylist; // Mantiene lo stato: quale playlist stiamo visualizzando
     private Stage primaryStage;
 
+   /**
+     * Metodo di inizializzazione nativo di JavaFX.
+     * Qui leghiamo le colonne della UI alle proprietà della classe Track.
+     * Associa le colonne ai dati e configura i pulsanti di azione.
+     */
     @FXML
     public void initialize() {
+        // Configurazione standard delle colonne dati
         if (titleColumn != null) titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         if (authorColumn != null) authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+
+        
+        if (deleteColumn != null) {
+            deleteColumn.setCellFactory(param -> new javafx.scene.control.TableCell<>() {
+                
+                // Creiamo il bottone "✕" 
+                private final javafx.scene.control.Button deleteBtn = new javafx.scene.control.Button("✕");
+
+                {
+                    // Stile visivo: testo rosso, sfondo trasparente, cursore a manina per UI Consistency
+                    deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff3b30; -fx-font-weight: bold; -fx-font-size: 14; -fx-cursor: hand;");
+                    
+                    
+                    deleteBtn.setOnAction(event -> {
+                        // 1. Recupera l'oggetto Track associato alla riga cliccata
+                        Track trackToRemove = getTableView().getItems().get(getIndex());
+                        
+                        // 2. Invoca direttamente il metodo di eliminazione sulla playlist in memoria
+                        if (currentPlaylist != null) {
+                            currentPlaylist.removeTrack(trackToRemove);
+                            // La UI si aggiornerà istantaneamente da sola grazie all'ObservableList
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    // Mostra il pulsante solo se la riga contiene effettivamente dei dati
+                    if (empty || getIndex() >= getTableView().getItems().size()) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(deleteBtn);
+                    }
+                }
+            });
+        }
     }
 
     /**

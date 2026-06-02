@@ -80,4 +80,17 @@ public class PlaylistTest {
         // 2. Verifica rimozione di una traccia non presente (o già rimossa)
         assertFalse(p.removeTrack(t1), "La rimozione di una traccia non presente deve restituire false");
     }
+
+    @Test
+    public void testSetName() {
+        // Setup
+        Playlist p = new Playlist("Nome Iniziale");
+        assertEquals("Nome Iniziale", p.getName(), "Il nome iniziale deve coincidere");
+
+        // Azione: Modifica del nome
+        p.setName("Nuovo Nome Playlist");
+
+        // Verifica
+        assertEquals("Nuovo Nome Playlist", p.getName(), "Il nome deve essere aggiornato correttamente dopo la modifica");
+    }
 }

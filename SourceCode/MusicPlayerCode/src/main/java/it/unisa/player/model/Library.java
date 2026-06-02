@@ -4,14 +4,17 @@ package it.unisa.player.model;
 public class Library {
     //Le liste sono observable per l'aggiornamento automatico delle view
     private javafx.collections.ObservableList<Track> tracks;
-
+    private javafx.collections.ObservableList<Playlist> playlists;
+    
     public Library() {
         this.tracks = javafx.collections.FXCollections.observableArrayList();
+        this.playlists = javafx.collections.FXCollections.observableArrayList();
     }
 
     public void addTrack(Track t) { tracks.add(t); }
     public void removeTrack(Track t) { tracks.remove(t); }
     public javafx.collections.ObservableList<Track> getAllTracks() { return tracks; }
+    public javafx.collections.ObservableList<Playlist> getPlaylists() { return playlists; }
 
 
     // Inizializzazione con dati di prova
@@ -23,6 +26,9 @@ public class Library {
         tracks.add(t1);
         tracks.add(t2);
         tracks.add(t3);
+
+        Playlist p1 = new Playlist("Classici Rock");
+        playlists.add(p1);
 
     }
 }

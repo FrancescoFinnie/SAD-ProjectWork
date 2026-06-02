@@ -153,7 +153,24 @@ public class LibraryController {
     //rimanda a playlist viewer (task 14.3)
     @FXML
     public void onViewPlaylistsClick() {
-        System.out.println("da implementare");
+        try {
+            // Carichiamo la playlist 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/PlaylistView.fxml"));
+            Parent root = loader.load();
+            
+            PlaylistController targetController = loader.getController();
+            if (targetController != null) {
+                targetController.setDependencies(this.library, this.primaryStage);
+            }
+            
+            // Cambiamo la scena
+            if (primaryStage != null && primaryStage.getScene() != null) {
+                primaryStage.getScene().setRoot(root);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Errore nell'apertura della vista Playlist.");
+        }
     }
 
 

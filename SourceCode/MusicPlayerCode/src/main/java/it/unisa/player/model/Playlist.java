@@ -1,0 +1,24 @@
+package it.unisa.player.model;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+public class Playlist {
+    private String name;
+    // List Observable
+    private ObservableList<Track> tracks; 
+
+    public Playlist(String name) {
+        this.name = name;
+        this.tracks = FXCollections.observableArrayList();
+    }
+
+    // Getter usati dalla TableView per leggere i dati
+    public String getName() { 
+        return name; 
+    }
+
+    public ObservableList<Track> getTracks() { 
+        return tracks; 
+    }
+}

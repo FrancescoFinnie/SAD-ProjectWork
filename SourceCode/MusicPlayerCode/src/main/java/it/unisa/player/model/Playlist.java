@@ -35,4 +35,16 @@ public class Playlist {
         tracks.add(t);
         return true;
     }
+
+    /**
+     * Rimuove una traccia specifica dalla playlist.
+     * @param t La traccia da rimuovere.
+     * @return true se la traccia era presente ed è stata rimossa, false altrimenti.
+     */
+    public boolean removeTrack(Track t) {
+        if (t == null) return false;
+        
+        // La ObservableList rimuove l'oggetto e notifica automaticamente la UI
+        return tracks.remove(t);
+    }
 }

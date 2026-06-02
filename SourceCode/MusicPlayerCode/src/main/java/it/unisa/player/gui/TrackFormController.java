@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
 
 public class TrackFormController {
 
@@ -51,15 +52,21 @@ public class TrackFormController {
     public void onSaveNewTrack() {
         try {
             // Estrazione delle stringhe dai campi di input
-            String title = titleField.getText();
-            String author = authorField.getText();
-            String genre = genreField.getText();
+            String title = titleField.getText().trim();
+            String author = authorField.getText().trim();
+            String genre = genreField.getText().trim();
+
+            // 1. Validazione campi obbligatori vuoti
+            if (title.isEmpty() || author.isEmpty()) {
+                showErrorAlert("Campi Incompleti", "Titolo e Autore sono obbligatori per salvare una traccia.");
+                return;
+            }
 
             //Parsing e validazione dell'Anno (Limite 2026)
             int year = Integer.parseInt(yearField.getText().trim());
             if (year > 2026) {
-                System.err.println("Errore di compilazione: l'anno non può essere superiore al 2026!");
-                return; 
+                showErrorAlert("Errore di Validazione Anno", "L'anno di rilascio inserito non può essere superiore al 2026!");
+                return;
             }
 
             //Parsing della durata (mm:ss o secondi)
@@ -67,9 +74,25 @@ public class TrackFormController {
             int duration;
             if (durationText.contains(":")) {
                 String[] parts = durationText.split(":");
-                duration = (Integer.parseInt(parts[0]) * 60) + Integer.parseInt(parts[1]); 
+                // Controlla che ci siano sia i minuti che i secondi (es. 03:45 ha lunghezza 2)
+                if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+                    showErrorAlert("Formato Durata Errato", "Inserisci 'minuti:secondi'.");
+                    return;
+                }
+                int minutes = Integer.parseInt(parts[0]);
+                int seconds = Integer.parseInt(parts[1]);
+
+                // Controlla che i secondi inseriti siano validi (tra 0 e 59)
+                if (seconds < 0 || seconds > 59) {
+                    showErrorAlert("Errore nei Secondi", "I secondi devono essere compresi tra 00 e 59.");
+                    return;
+                }
+
+                duration = (minutes * 60) + seconds;
             } else {
-                duration = Integer.parseInt(durationText);
+                // Se l'utente non ha inserito i due punti ":" lo blocchiamo chiedendo i secondi nel formato mm:ss
+                showErrorAlert("Formato Durata Obbligatorio", "La durata deve essere nel formato 'mm:ss'.");
+                return;
             }
 
             //Decidiamo se siamo in modalità aggiunta o modifica in base alla presenza di trackToEdit
@@ -98,7 +121,8 @@ public class TrackFormController {
             onBackButtonClicked();
             
         } catch (NumberFormatException e) {
-            System.err.println("Errore di compilazione: controlla i campi numerici!");
+            // Intercettazione dell'errore nel caso l'utente scriva lettere nei campi anno o durata
+            showErrorAlert("Errore di Compilazione", "Controlla l'anno e la durata.");
         }
     }
 
@@ -121,5 +145,15 @@ public class TrackFormController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    /**
+     * Metodo di supporto per mostrare un Alert di errore standard di JavaFX
+     */
+    private void showErrorAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Errore");
+        alert.setHeaderText(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

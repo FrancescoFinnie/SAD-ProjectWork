@@ -1,11 +1,15 @@
 package it.unisa.player.gui;
 
+import java.util.Optional;
+
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Track;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;       
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableCell;     
@@ -47,7 +51,6 @@ public class LibraryController {
     public void setDependencies(Library library, Stage primaryStage) {
         this.library = library;
         this.primaryStage = primaryStage;
-        refreshTable();
 
         if (trackTable != null && library != null) {
             trackTable.setItems(library.getAllTracks());
@@ -68,10 +71,22 @@ public class LibraryController {
                     //Gestione dell'evento di click sul pulsante di cancellazione
                     deleteBtn.setOnAction(event -> {
                         Track track = getTableView().getItems().get(getIndex());
-                        
                         if (LibraryController.this.library != null) {
-                            LibraryController.this.library.removeTrack(track);
-                            System.out.println("Traccia eliminata: " + track.getTitle());
+                            // Creazione dell'Alert grafico di conferma
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Conferma Eliminazione");
+                            alert.setHeaderText("Stai per eliminare la traccia");
+                            alert.setContentText("Sei sicuro di voler rimuovere \"" + track.getTitle() + "\"?");
+
+                            // Mostra l'alert e attende il click del mouse
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.OK) {
+                                // Se l'utente clicca OK, cancella la traccia
+                                LibraryController.this.library.removeTrack(track);
+                                System.out.println("Traccia eliminata: " + track.getTitle());
+                            } else {
+                                System.out.println("Eliminazione annullata.");
+                            }
                         }
                     });
                 }
@@ -114,14 +129,6 @@ public class LibraryController {
                     }
                 }
             });
-        }
-    }
-
-    //Svuota la tabella grafica e la ripopola estraendo la lista aggiornata dal modello Library.
-    private void refreshTable() {
-        if (trackTable != null && library != null) {
-            trackTable.getItems().clear();
-            trackTable.getItems().addAll(library.getAllTracks());
         }
     }
 

@@ -18,6 +18,10 @@ public class Playlist {
         return name; 
     }
 
+    public void setName(String newName) { 
+        this.name = newName; 
+    }
+    
     public ObservableList<Track> getTracks() { 
         return tracks; 
     }

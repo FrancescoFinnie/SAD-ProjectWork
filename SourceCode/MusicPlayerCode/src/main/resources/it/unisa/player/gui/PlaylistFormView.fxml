@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="400.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.player.gui.PlaylistFormController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <Button onAction="#onBackButtonClicked" text="←" style="-fx-background-radius: 50; -fx-background-color: #e0e0e0; -fx-font-weight: bold;" />
+        <Label text="Aggiungi playlist" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+    </HBox>
+
+    <VBox spacing="5.0">
+        <Label text="Nome Playlist" style="-fx-font-weight: bold;" />
+        <TextField fx:id="nameField" promptText="Nome Playlist" style="-fx-background-color: #f0f0f0; -fx-pref-height: 40;" />
+    </VBox>
+    
+    <Label fx:id="errorLabel" style="-fx-text-fill: red; -fx-font-size: 14;" visible="false" />
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <Button onAction="#onSaveClick" text="Salva" maxWidth="Infinity" style="-fx-background-color: #a1a1a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 50; -fx-background-radius: 10;" />
+</VBox>

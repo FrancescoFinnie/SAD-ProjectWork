@@ -16,6 +16,21 @@ public class Library {
     public javafx.collections.ObservableList<Track> getAllTracks() { return tracks; }
     public javafx.collections.ObservableList<Playlist> getPlaylists() { return playlists; }
 
+    /**
+     * Aggiunge una nuova playlist alla libreria, impedendo i duplicati.
+     * @param p La playlist da aggiungere.
+     * @return true se l'aggiunta ha successo, false se esiste già una playlist con lo stesso nome.
+     */
+    public boolean addPlaylist(Playlist p) {
+        for (Playlist existing : playlists) {
+            if (existing.getName().equalsIgnoreCase(p.getName())) {
+                return false; // Trovato un duplicato, rifiuta l'aggiunta
+            }
+        }
+        playlists.add(p);
+        return true; // Aggiunta con successo
+    }
+
 
     // Inizializzazione con dati di prova
     public void loadSampleData() {

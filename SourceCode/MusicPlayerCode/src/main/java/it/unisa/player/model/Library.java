@@ -31,6 +31,7 @@ public class Library {
         return true; // Aggiunta con successo
     }
 
+    public void removePlaylist(Playlist p) { playlists.remove(p); }
 
     // Inizializzazione con dati di prova
     public void loadSampleData() {

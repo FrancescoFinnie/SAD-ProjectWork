@@ -29,4 +29,21 @@ public class LibraryTest {
         assertEquals(1, library.getPlaylists().size());
     }
 
+    @Test
+    public void testRemovePlaylist() {
+        // Creiamo e aggiungiamo una playlist
+        Playlist p = new Playlist("Playlist da cancellare");
+        library.addPlaylist(p);
+        
+        // Assicuriamoci che sia stata aggiunta
+        assertEquals(1, library.getPlaylists().size());
+        
+        // Eliminiamola passando direttamente l'oggetto
+        library.removePlaylist(p);
+        
+        // Verifichiamo che la memoria sia tornata vuota
+        assertEquals(0, library.getPlaylists().size());
+        assertFalse(library.getPlaylists().contains(p));
+    }
+
 }

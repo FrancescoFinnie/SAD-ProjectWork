@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="700.0" prefWidth="400.0" spacing="15.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.player.gui.LibraryController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button style="-fx-background-color: #1c1c1e; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 120; -fx-pref-height: 40; -fx-background-radius: 5;" text="Tracks" />
+        <Button onAction="#onViewPlaylistsClick" style="-fx-background-color: #a1a1a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 120; -fx-pref-height: 40; -fx-background-radius: 5;" text="Playlist" />
+    </HBox>
+
+    <TextField promptText="🔍 Ricerca Traccia" style="-fx-background-radius: 20; -fx-pref-height: 35;" />
+
+<TableView fx:id="trackTable" style="-fx-background-radius: 10;" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="titleColumn" prefWidth="130.0" text="Titolo" />
+            <TableColumn fx:id="authorColumn" prefWidth="162.4000244140625" text="Autore" />
+            <TableColumn fx:id="deleteColumn" prefWidth="66.39996337890625" resizable="false" style="-fx-alignment: CENTER-RIGHT; -fx-padding: 0 10 0 0;" text="" />
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" translateY="-10">
+        <Button onAction="#onUndoClick" style="-fx-background-color: #a1a1a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-pref-width: 70;" text="Undo">
+         <HBox.margin>
+            <Insets right="240.0" />
+         </HBox.margin></Button>
+        <Button onAction="#onAddTrackClick" style="-fx-background-color: #a1a1a6; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold; -fx-background-radius: 50; -fx-min-width: 40; -fx-min-height: 40;" text="+" />
+    </HBox>
+
+    <VBox style="-fx-border-color: #cccccc; -fx-border-width: 1 0 0 0; -fx-padding: 15 0 0 0;">
+        <Label alignment="CENTER" maxWidth="Infinity" style="-fx-font-size: 12;" text="🎵 Seleziona un brano..." />
+        <HBox alignment="CENTER" spacing="25.0">
+            <Button style="-fx-background-color: transparent; -fx-font-size: 16;" text="🔀" />
+            <Button style="-fx-background-color: transparent; -fx-font-size: 18;" text="⏮" />
+            <Button style="-fx-background-color: transparent; -fx-font-size: 24;" text="▶" />
+            <Button style="-fx-background-color: transparent; -fx-font-size: 18;" text="⏭" />
+            <Button style="-fx-background-color: transparent; -fx-font-size: 16;" text="🔁" />
+        </HBox>
+    </VBox>
+</VBox>

@@ -25,7 +25,7 @@ public class PlaylistController {
     @FXML private TableColumn<Playlist, Void> deleteColumn;
 
     private Library library;
-    private Stage primaryStage;
+    private MainController mainController;
 
     @FXML
     public void initialize() {
@@ -113,23 +113,23 @@ public class PlaylistController {
             PlaylistDetailController detailController = loader.getController();
             if (detailController != null) {
                 // Passiamo la libreria, la singola playlist cliccata e lo stage
-                detailController.setDependencies(this.library, targetPlaylist, this.primaryStage);
+                detailController.setDependencies(this.library, this.mainController, targetPlaylist);
             }
             
             // Effettuiamo il cambio di scena
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+            if (this.mainController != null) {
+                this.mainController.setCenterView(root);
             }
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             System.err.println("Errore nell'apertura della vista di dettaglio della playlist.");
         }
     }
 
-    public void setDependencies(Library library, Stage primaryStage) {
+    // Iniezione del MainController per delegare la navigazione centrale
+    public void setDependencies(Library library, MainController mainController) {
         this.library = library;
-        this.primaryStage = primaryStage;
-        
+        this.mainController = mainController;
         // Popola la tabella con le playlist
         if (playlistTable != null && library != null) {
             playlistTable.setItems(library.getPlaylists());
@@ -139,16 +139,18 @@ public class PlaylistController {
     @FXML
     public void onBackToLibraryClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/LibraryView.fxml"));
+            // REFACTORING TD2.4: Uso di ViewConstants
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.LIBRARY_VIEW));
             Parent root = loader.load();
             
             LibraryController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.primaryStage);
+                targetController.setDependencies(this.library, this.mainController);
             }
             
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+            // REFACTORING TD2.4: Switch dinamico al centro del BorderPane globale
+            if (this.mainController != null) {
+                this.mainController.setCenterView(root);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,7 +161,25 @@ public class PlaylistController {
     // Metodi vuoti per le prossime us
     @FXML
     public void onAddPlaylistClick() {
-        System.out.println("Aggiunta playlist non ancora implementata nello Sprint attuale.");
+        try {
+            // REFACTORING TD2.4: Uso di ViewConstants
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.PLAYLIST_FORM_VIEW));
+            Parent root = loader.load();
+            
+            PlaylistFormController formController = loader.getController();
+            if (formController != null) {
+                // REFACTORING TD2.4: Inietto mainController
+                formController.setDependencies(this.library, this.mainController);
+            }
+            
+            // REFACTORING TD2.4: Switch dinamico al centro del BorderPane globale
+            if (this.mainController != null) {
+                this.mainController.setCenterView(root);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Errore nell'apertura della vista PlaylistForm.");
+        }
     }
 
     @FXML

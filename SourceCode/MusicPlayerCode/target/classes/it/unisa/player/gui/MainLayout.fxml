@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.player.gui.MainController">
+    
+    <center>
+        </center>
+    
+<bottom>
+        <VBox alignment="CENTER" spacing="10" style="-fx-background-color: #91ca8d; -fx-padding: 12 15 15 15; -fx-border-color: #282828; -fx-border-width: 1 0 0 0;">
+            
+            <HBox alignment="CENTER" spacing="10">
+                <Label fx:id="timeElapsedLabel" text="00:00" style="-fx-text-fill: #000000; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <ProgressBar fx:id="songProgressBar" progress="0.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" style="-fx-accent: #1db954;"/>
+                <Label fx:id="timeTotalLabel" text="00:00" style="-fx-text-fill: #000000; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            </HBox>
+            
+            <VBox alignment="CENTER" spacing="2">
+                <Label fx:id="currentTrackLabel" text="Nessuna traccia" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <Label fx:id="currentAuthorLabel" text="Autore" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+            </VBox>
+            
+            <HBox spacing="22" alignment="CENTER">
+                <Button fx:id="shuffleButton"  text="🔀" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
+                
+                <Button fx:id="playButton"  text="▶" style="-fx-background-color: white; -fx-text-fill: black; -fx-font-size: 14px; -fx-background-radius: 50em; -fx-min-width: 36px; -fx-min-height: 36px; -fx-cursor: hand;"/>
+                <Button fx:id="pauseButton"  text="⏸" visible="false" managed="false" style="-fx-background-color: white; -fx-text-fill: black; -fx-font-size: 14px; -fx-background-radius: 50em; -fx-min-width: 36px; -fx-min-height: 36px; -fx-cursor: hand;"/>
+                
+                <Button fx:id="skipButton"  text="⏭" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
+                <Button fx:id="loopButton"  text="🔁" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
+            </HBox>
+            
+        </VBox>
+    </bottom>
+</BorderPane>

@@ -22,7 +22,7 @@ public class PlaylistDetailController {
 
     private Library library;
     private Playlist currentPlaylist; // Mantiene lo stato: quale playlist stiamo visualizzando
-    private Stage primaryStage;
+    private MainController mainController;
 
    /**
      * Metodo di inizializzazione nativo di JavaFX.
@@ -76,10 +76,10 @@ public class PlaylistDetailController {
     /**
      * Dependency Injection: passiamo al controller tutto ciò di cui ha bisogno per operare.
      */
-    public void setDependencies(Library library, Playlist playlist, Stage primaryStage) {
+    public void setDependencies(Library library, MainController mainController, Playlist playlist) {
         this.library = library;
         this.currentPlaylist = playlist;
-        this.primaryStage = primaryStage;
+        this.mainController = mainController;
 
         if (this.currentPlaylist != null) {
             // Aggiorniamo la View
@@ -91,24 +91,26 @@ public class PlaylistDetailController {
         }
     }
 
-        /**
+    /**
      * Tasto "←" per tornare all'elenco di tutte le playlist.
      * Distrugge questa vista e ricarica il PlaylistController.
      */
     @FXML
     public void onBackButtonClicked() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/PlaylistView.fxml"));
+            // REFACTORING TD2.4: Uso di ViewConstants
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.PLAYLIST_VIEW));
             Parent root = loader.load();
             
             // Dobbiamo ri-iniettare le dipendenze nel controller principale
             PlaylistController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.primaryStage);
+                targetController.setDependencies(this.library, this.mainController);
             }
             
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+            // REFACTORING TD2.4: Deleghiamo il cambio scena alla vista centrale del MainController
+            if (this.mainController != null) {
+                this.mainController.setCenterView(root);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,7 +137,6 @@ public class PlaylistDetailController {
             // APPLICATION_MODAL impedisce all'utente di cliccare sulla finestra principale sottostante
             // finché il popup di selezione non viene chiuso o completato.
             dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL); 
-            dialogStage.initOwner(primaryStage);
             dialogStage.setScene(new javafx.scene.Scene(root));
 
             // 3. Iniezione delle Dipendenze (Dependency Injection)

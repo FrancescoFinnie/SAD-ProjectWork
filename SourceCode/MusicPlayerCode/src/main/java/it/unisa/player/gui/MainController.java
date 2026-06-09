@@ -1,7 +1,8 @@
 package it.unisa.player.gui;
 
 import javafx.scene.Node;
-
+import it.unisa.player.engine.PlaybackEngine;
+import it.unisa.player.engine.PlayingState;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.Button;
@@ -16,7 +17,7 @@ import javafx.scene.control.ProgressBar;
  */
 public class MainController {
 
-
+    private PlaybackEngine engine;
     // --- Contenitore Radice ---
     @FXML
     private BorderPane rootPane;
@@ -47,8 +48,37 @@ public class MainController {
      */
     @FXML
     public void initialize() {
-        // La UI persistente è caricata. 
-        // In futuro qui agganceremo i Listener dello State Pattern e della Timeline.
+        this.engine = PlaybackEngine.getInstance();
+
+        // Ascolta il cambio traccia per aggiornare i testi
+        engine.currentTrackProperty().addListener((observable, oldTrack, newTrack) -> {
+            if (newTrack != null) {
+                currentTrackLabel.setText(newTrack.getTitle());
+                currentAuthorLabel.setText(newTrack.getAuthor());
+            } else {
+                currentTrackLabel.setText("Nessun brano in riproduzione");
+                currentAuthorLabel.setText("-");
+            }
+        });
+
+        // Ascolta il cambio di stato per nascondere/mostrare i pulsanti (Play/Pause Swap)
+        engine.stateProperty().addListener((observable, oldState, newState) -> {
+            if (newState instanceof PlayingState) {
+                // Se è in riproduzione: nascondi il Play, mostra la Pausa
+                playButton.setVisible(false);
+                playButton.setManaged(false);
+                
+                pauseButton.setVisible(true);
+                pauseButton.setManaged(true);
+            } else {
+                // Se è in Pausa o Stop: mostra il Play, nascondi la Pausa
+                playButton.setVisible(true);
+                playButton.setManaged(true);
+                
+                pauseButton.setVisible(false);
+                pauseButton.setManaged(false);
+            }
+        });
     }
 
     /**
@@ -69,4 +99,23 @@ public class MainController {
             System.err.println("Errore di Navigazione: rootPane non inizializzato o vista nulla.");
         }
     }
+
+    
+
+    // Delega eventi UI per Play e Pausa.
+    @FXML
+    private void handlePlayClick() {
+        engine.pressPlay();
+    }
+
+    @FXML
+    private void handlePauseClick() {
+        engine.pressPause();
+    }
+
+    @FXML
+    private void handleSkipClick() {
+        engine.playNext();
+    }
+
 }

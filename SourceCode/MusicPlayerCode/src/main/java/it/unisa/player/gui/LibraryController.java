@@ -2,8 +2,10 @@ package it.unisa.player.gui;
 
 import java.util.Optional;
 
+import it.unisa.player.engine.PlaybackEngine;
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Track;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,7 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableCell;     
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
+import javafx.util.Duration;
 /**
  * Il Controller della libreria. Gestisce sia la schermata principale (tabella dei brani)
  * sia la schermata secondaria del form (inserimento e modifica).
@@ -60,7 +62,7 @@ public class LibraryController {
     /**
      * Configura le logiche di interazione all'interno della tabella (Cestino e Doppio Click).
      */
-    private void setupTableInteractions() {
+private void setupTableInteractions() {
         // Gestione della colonna di cancellazione 
         if (deleteColumn != null) {
             deleteColumn.setCellFactory(param -> new TableCell<Track, Void>() {
@@ -71,22 +73,10 @@ public class LibraryController {
                     //Gestione dell'evento di click sul pulsante di cancellazione
                     deleteBtn.setOnAction(event -> {
                         Track track = getTableView().getItems().get(getIndex());
+                        
                         if (LibraryController.this.library != null) {
-                            // Creazione dell'Alert grafico di conferma
-                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                            alert.setTitle("Conferma Eliminazione");
-                            alert.setHeaderText("Stai per eliminare la traccia");
-                            alert.setContentText("Sei sicuro di voler rimuovere \"" + track.getTitle() + "\"?");
-
-                            // Mostra l'alert e attende il click del mouse
-                            Optional<ButtonType> result = alert.showAndWait();
-                            if (result.isPresent() && result.get() == ButtonType.OK) {
-                                // Se l'utente clicca OK, cancella la traccia
-                                LibraryController.this.library.removeTrack(track);
-                                System.out.println("Traccia eliminata: " + track.getTitle());
-                            } else {
-                                System.out.println("Eliminazione annullata.");
-                            }
+                            LibraryController.this.library.removeTrack(track);
+                            System.out.println("Traccia eliminata: " + track.getTitle());
                         }
                     });
                 }
@@ -102,32 +92,59 @@ public class LibraryController {
                 }
             });
         }
+
         //Gestione del doppio click sulla riga per modificare la traccia
         if (trackTable != null) {
+            // Creiamo un timer condiviso per la tabella
+            final PauseTransition clickTimer = new PauseTransition(Duration.millis(250));
+            
             trackTable.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) { 
-                    Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+                Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+                int startIndex = trackTable.getSelectionModel().getSelectedIndex();
+        
                     if (selectedTrack != null) {
-                        try {
-                            // Uso della costante al posto della stringa hard-coded
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.ADD_TRACK_VIEW));
-                            Parent view = loader.load();
+            
+                        // ==========================================
+                        // CASO 1: SINGOLO CLICK -> Apri Form Modifica
+                        // ==========================================
+                        if (event.getClickCount() == 1) { 
+                            // Avviamo il timer: se scade senza altri click, si apre il form
+                            clickTimer.setOnFinished(e -> {
+                                try {
+                                    FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.ADD_TRACK_VIEW));
+                                    Parent view = loader.load();
 
-                            TrackFormController formController = loader.getController();
-                            if (formController != null) {
-                                // Passiamo mainController al posto di primaryStage
-                                formController.setDependencies(LibraryController.this.library, LibraryController.this.mainController);
-                                formController.setTrackToEdit(selectedTrack);
-                            }
+                                    TrackFormController formController = loader.getController();
+                                    if (formController != null) {
+                                        formController.setDependencies(LibraryController.this.library, LibraryController.this.mainController);
+                                        formController.setTrackToEdit(selectedTrack);
+                                    }
 
-                            // Deleghiamo il cambio di vista al MainController
-                            if (LibraryController.this.mainController != null) {
-                                LibraryController.this.mainController.setCenterView(view);
+                                    // Deleghiamo il cambio di vista al MainController
+                                    if (LibraryController.this.mainController != null) {
+                                        LibraryController.this.mainController.setCenterView(view);
+                                    }
+                                    System.out.println("Singolo click: apertura form di modifica per " + selectedTrack.getTitle());
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            });
+                            clickTimer.playFromStart();
+                        } 
+            
+                        // Avvio riproduzione da Doppio Click.
+                        // Recupera la libreria corrente e invoca playFromLibrary
+                        // sull'engine al doppio click dell'utente sulla tabella.
+                        else if (event.getClickCount() == 2) { 
+                            // Blocca subito il timer del primo click (evita il cambio scena)
+                            clickTimer.stop(); 
+                            
+                            if (startIndex >= 0 && LibraryController.this.library != null) {
+                                // CORRETTO: Passiamo l'intero oggetto library del controller
+                                it.unisa.player.engine.PlaybackEngine.getInstance().playFromLibrary(LibraryController.this.library, startIndex);
+                                System.out.println("Doppio click: avvio traccia " + selectedTrack.getTitle());
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    }
                 }
             });
         }

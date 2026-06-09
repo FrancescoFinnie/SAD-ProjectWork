@@ -1,7 +1,11 @@
 package it.unisa.player.model;
 
+import it.unisa.player.engine.Iterator;
+import it.unisa.player.engine.SequentialIterator;
+import it.unisa.player.engine.ShuffleIterator;
 
-public class Library {
+
+public class Library implements IterableCollection {
     //Le liste sono observable per l'aggiornamento automatico delle view
     private javafx.collections.ObservableList<Track> tracks;
     private javafx.collections.ObservableList<Playlist> playlists;
@@ -46,5 +50,17 @@ public class Library {
         Playlist p1 = new Playlist("Classici Rock");
         playlists.add(p1);
 
+    }
+
+        
+    @Override
+    public Iterator createSequentialIterator(int startIndex) {
+         return new SequentialIterator(this.tracks, startIndex);
+    }
+
+    //Aggiunto per la task 21
+    @Override
+    public Iterator createShuffleIterator(int startIndex) {
+        return new ShuffleIterator(this.tracks, startIndex);
     }
 }

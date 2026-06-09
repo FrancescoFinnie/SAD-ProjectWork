@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeAll; // AGGIUNTA
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import it.unisa.player.model.Track;
+import it.unisa.player.model.Library;
+import it.unisa.player.model.Playlist;
 
 import javafx.application.Platform; // AGGIUNTA
 
@@ -16,6 +18,7 @@ public class PlaybackEngineTest {
 
     private PlaybackEngine engine;
     private List<Track> testTracks;
+    private Playlist mockPlaylist;
 
 
     // Inizializzazione Toolkit JavaFX per Timeline.
@@ -41,6 +44,10 @@ public class PlaybackEngineTest {
         testTracks.add(t1);
         testTracks.add(t2);
 
+        // Setup della playlist fittizia per i test
+        mockPlaylist = new Playlist("Playlist Test");
+        mockPlaylist.addTrack(t1);
+        mockPlaylist.addTrack(t2);
     }
 
 
@@ -49,13 +56,27 @@ public class PlaybackEngineTest {
     // che la prima traccia diventi il currentTrack.
     @Test
     public void testPlayFromLibrary() {
-        
+
         // Verifica 1: La coda è stata popolata
         assertEquals(2, engine.getQueue().size(), "La coda deve contenere esattamente 2 brani.");
         
         // Verifica 2: Il currentTrack è stato impostato sul brano richiesto (indice 0)
         assertNotNull(engine.getCurrentTrack(), "La traccia corrente non deve essere nulla.");
         assertEquals("Brano 1", engine.getCurrentTrack().getTitle(), "Il titolo della traccia corrente deve essere 'Brano 1'.");
+    }
+    @Test
+    public void testPlayFromPlaylist() {
+        // Facciamo partire dalla SECONDA traccia (indice 1)
+        engine.playFromPlaylist(mockPlaylist, 1);
+        
+        // Verifica 1: Il contesto attuale del motore è diventato la playlist
+        assertEquals(mockPlaylist, engine.getCurrentPlaylistContext(), "Il contesto playlist non è stato aggiornato.");
+        
+        // Verifica 2: La queue è popolata con i brani della playlist
+        assertEquals(2, engine.getQueue().size(), "La coda deve contenere esattamente i 2 brani della playlist.");
+        
+        // Verifica 3: La traccia corrente è partita dall'indice 1 (Brano 2)
+        assertEquals("Brano 2", engine.getCurrentTrack().getTitle(), "Il brano in riproduzione dovrebbe essere il secondo.");
     }
 
     // Test: Verifica delle transizioni dello State Pattern.

@@ -1,6 +1,7 @@
 package it.unisa.player.engine;
 
 import it.unisa.player.model.Library;
+import it.unisa.player.model.Playlist;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,6 +12,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import it.unisa.player.model.Track;
 import it.unisa.player.model.IterableCollection;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
+
 
 public class PlaybackEngine {
     private static PlaybackEngine instance;
@@ -58,6 +65,14 @@ public class PlaybackEngine {
     
     public void setState(PlayerState newState) { 
         this.stateProperty.set(newState); 
+
+        // se viene riprodotto un brano, il timer parte
+        //altrimenti (pausa), viene fermato
+        if (newState instanceof PlayingState) {
+            startSimulationTimer();
+        } else {
+            stopSimulationTimer();
+        }
     }
     
     public PlayerState getState() { return this.stateProperty.get(); }
@@ -91,6 +106,38 @@ public class PlaybackEngine {
         }
     }
 
+    // Aggiunto riferimento currentPlaylistContext per tracciare la provenienza.
+    // Implementato playFromPlaylist per clonare la queue, avviare il SequentialIterator
+    // delegando a pressPlay() e tracciare correttamente la playlist in uso.
+
+    private Playlist currentPlaylistContext = null;
+
+    public Playlist getCurrentPlaylistContext() {
+        return currentPlaylistContext;
+    }
+
+    public void playFromPlaylist(Playlist playlist, int startIndex) {
+        this.currentPlaylistContext = playlist;
+        this.currentCollection = playlist; // Salva la playlist come collezione corrente
+
+        this.queue.clear();
+        if (playlist.getTracks() != null) {
+            this.queue.addAll(playlist.getTracks());
+        }
+
+        if (playlist.getTracks() != null && !playlist.getTracks().isEmpty()) {
+            //Chiede alla playlist di fabbricare l'iteratore
+            this.iterator = currentCollection.createSequentialIterator(startIndex);
+            
+            if (this.iterator.hasNext()) {
+                this.currentTrack.set(this.iterator.next());
+                this.setState(new StoppedState(this));
+                this.pressPlay();
+            }
+        }
+    }
+
+
     public void playNext() {
         if (iterator != null && iterator.hasNext()) {
             this.currentTrack.set(iterator.next());
@@ -99,6 +146,11 @@ public class PlaybackEngine {
             System.out.println("Skip completato. Brano corrente: " + getCurrentTrack().getTitle());
         } else {
             System.out.println("Fine della coda raggiunta.");
+            if (currentPlaylistContext != null) {
+                skipToNextPlaylist();
+            } else {
+                this.pressStop();
+            }
         }
     }
 
@@ -117,6 +169,45 @@ public class PlaybackEngine {
     public void resetTimer() {
         this.currentTimeProperty.set(0);
         this.progressProperty.set(0.0);
+    }
+
+
+    // Feat(Engine): Timeline e controllo fine traccia.
+    // Se il brano termina (secondi >= durata), invoca playNext().
+
+    private Timeline playbackTimer;
+
+    public void startSimulationTimer() {
+        if (playbackTimer != null) playbackTimer.stop();
+        
+        playbackTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            
+            // Incrementa i secondi passati (usando la property già presente in classe)
+            currentTimeProperty.set(currentTimeProperty.get() + 1);
+            int currentSecs = currentTimeProperty.get();
+            
+            Track current = getCurrentTrack();
+            if (current != null) {
+                int trackDuration = current.getDuration();
+                if (trackDuration <= 0) trackDuration = 1; 
+                
+                System.out.println("Riproduzione... " + currentSecs + "s / " + trackDuration + "s (" + current.getTitle() + ")");
+                
+                // Implementazione esatta del Task 20.1
+                if (currentSecs >= trackDuration) {
+                    System.out.println("Traccia finita! Passo in automatico alla successiva...");
+                    playNext(); 
+                }
+            }
+        }));
+        playbackTimer.setCycleCount(Timeline.INDEFINITE);
+        playbackTimer.play();
+    }
+
+    public void stopSimulationTimer() {
+        if (playbackTimer != null) {
+            playbackTimer.stop();
+        }
     }
 
 }

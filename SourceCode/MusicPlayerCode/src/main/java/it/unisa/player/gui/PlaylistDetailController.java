@@ -3,6 +3,7 @@ package it.unisa.player.gui;
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Playlist;
 import it.unisa.player.model.Track;
+import it.unisa.player.engine.PlaybackEngine;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -71,6 +72,17 @@ public class PlaylistDetailController {
                 }
             });
         }
+                
+
+        // Avvio riproduzione da Doppio Click su brano della Playlist.
+        // Intercetta l'evento sulla tabella delegando al PlaybackEngine.
+
+        trackTable.setOnMouseClicked(event -> {
+            // Se l'utente fa doppio click e ha effettivamente selezionato una riga
+            if (event.getClickCount() == 1 && trackTable.getSelectionModel().getSelectedItem() != null) {
+                onPlayPlaylistClicked();
+            }
+        });
     }
 
     /**
@@ -157,4 +169,25 @@ public class PlaylistDetailController {
             System.err.println("Errore critico: Impossibile caricare l'interfaccia SelectTrack.fxml.");
         }
     }
+    // Intercetta il click sul bottone Play generale o il doppio click, 
+    // individua l'indice di partenza (0 se non selezionato) 
+    // e delega il lancio al PlaybackEngine.
+    @FXML
+    public void onPlayPlaylistClicked() {
+        if (currentPlaylist == null || currentPlaylist.getTracks().isEmpty()) {
+            return; // Niente da riprodurre
+        }
+
+        int startIndex = 0;
+        
+        // Seleziona la traccia cliccata nella tabella (se c'è), altrimenti parte da 0
+        Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+        if (selectedTrack != null) {
+            startIndex = currentPlaylist.getTracks().indexOf(selectedTrack);
+        }
+
+        // Recupera il motore e invoca la riproduzione con il contesto playlist
+        PlaybackEngine.getInstance().playFromPlaylist(currentPlaylist, startIndex);
+    }
+
 }

@@ -26,14 +26,23 @@ public class App extends Application {
         library.loadSampleData();
 
         //Caricamento del file FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/LibraryView.fxml"));
-        Parent root = loader.load();
+        FXMLLoader mainLoader = new FXMLLoader(getClass().getResource(ViewConstants.MAIN_LAYOUT));
+        Parent root = mainLoader.load();
 
-        //Recuperiamo il controller associato alla view e gli passiamo le dipendenze necessarie
-        LibraryController controller = loader.getController();
-        if (controller != null) {
-            controller.setDependencies(library, primaryStage);
+        MainController mainController = mainLoader.getController();
+
+        // 2. Carica la vista iniziale (Libreria)
+        FXMLLoader libLoader = new FXMLLoader(getClass().getResource(ViewConstants.LIBRARY_VIEW));
+        Parent libraryView = libLoader.load();
+
+        // 3. Inietta il mainController al posto dello Stage
+        LibraryController libController = libLoader.getController();
+        if (libController != null) {
+            libController.setDependencies(library, mainController);
         }
+
+        // 4. Incastra la libreria al centro del Layout Globale
+        mainController.setCenterView(libraryView);
 
         //Configurazione della finestra grafica
         primaryStage.setTitle("Music Player - Sprint 1");

@@ -19,16 +19,16 @@ public class TrackFormController {
     @FXML private TextField yearField;
     @FXML private Label formTitleLabel;
 
-    private Library library;
-    private Stage primaryStage;
-    
+private Library library;
+    private MainController mainController;
+
     //Tiene traccia del brano che si sta modificando (se null, allora stiamo inserendo)
     private Track trackToEdit = null;
 
-    // Riceve le dipendenze necessarie
-    public void setDependencies(Library library, Stage primaryStage) {
+    // Riceve le dipendenze necessarie per delegare la navigazione
+    public void setDependencies(Library library, MainController mainController) {
         this.library = library;
-        this.primaryStage = primaryStage;
+        this.mainController = mainController;
     }
 
     // Permette al LibraryController di passare la traccia da modificare
@@ -47,69 +47,48 @@ public class TrackFormController {
             durationField.setText(String.format("%02d:%02d", min, sec));
         }
     }
-    //Scatta quando si clicca sul pulsante "Salva" all'interno del form di aggiunta/modifica traccia.
+
+
+    /**
+     * Scatta quando si clicca sul pulsante "Salva" all'interno del form di aggiunta/modifica traccia.
+     * Estrae i dati, li passa al Dominio e intercetta eventuali violazioni delle regole di business.
+     */
     @FXML
     public void onSaveNewTrack() {
         try {
             // Estrazione delle stringhe dai campi di input
-            String title = titleField.getText().trim();
-            String author = authorField.getText().trim();
-            String genre = genreField.getText().trim();
+            String title = titleField.getText();
+            String author = authorField.getText();
+            String genre = genreField.getText();
 
-            // 1. Validazione campi obbligatori vuoti
-            if (title.isEmpty() || author.isEmpty()) {
-                showErrorAlert("Campi Incompleti", "Titolo e Autore sono obbligatori per salvare una traccia.");
-                return;
-            }
-
-            //Parsing e validazione dell'Anno (Limite 2026)
+            // Parsing dell'Anno: la validazione logica è ora demandata esclusivamente al Modello (Track)
             int year = Integer.parseInt(yearField.getText().trim());
-            if (year > 2026) {
-                showErrorAlert("Errore di Validazione Anno", "L'anno di rilascio inserito non può essere superiore al 2026!");
-                return;
-            }
 
-            //Parsing della durata (mm:ss o secondi)
+            // Parsing della durata (mm:ss o secondi)
             String durationText = durationField.getText().trim();
             int duration;
             if (durationText.contains(":")) {
                 String[] parts = durationText.split(":");
-                // Controlla che ci siano sia i minuti che i secondi (es. 03:45 ha lunghezza 2)
-                if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
-                    showErrorAlert("Formato Durata Errato", "Inserisci 'minuti:secondi'.");
-                    return;
-                }
-                int minutes = Integer.parseInt(parts[0]);
-                int seconds = Integer.parseInt(parts[1]);
-
-                // Controlla che i secondi inseriti siano validi (tra 0 e 59)
-                if (seconds < 0 || seconds > 59) {
-                    showErrorAlert("Errore nei Secondi", "I secondi devono essere compresi tra 00 e 59.");
-                    return;
-                }
-
-                duration = (minutes * 60) + seconds;
+                duration = (Integer.parseInt(parts[0]) * 60) + Integer.parseInt(parts[1]);
             } else {
-                // Se l'utente non ha inserito i due punti ":" lo blocchiamo chiedendo i secondi nel formato mm:ss
-                showErrorAlert("Formato Durata Obbligatorio", "La durata deve essere nel formato 'mm:ss'.");
-                return;
+                duration = Integer.parseInt(durationText);
             }
 
-            //Decidiamo se siamo in modalità aggiunta o modifica in base alla presenza di trackToEdit
+            // Decidiamo se siamo in modalità aggiunta o modifica in base alla presenza di trackToEdit
             if (trackToEdit == null) {
-                //modalità aggiunta: creiamo un nuovo oggetto Track e lo aggiungiamo alla Library
+                // Modalità aggiunta: il costruttore invocherà i setter, validando i dati in tempo reale
                 Track newTrack = new Track(title, author, duration, genre, year);
                 library.addTrack(newTrack);
                 System.out.println("Traccia aggiunta con successo!");
             } else {
-                //modalità modifica 
-                // Aggiorniamo l'oggetto che si trova già nella lista della Library
+                // Modalità modifica: l'assegnamento passa dai setter che solleveranno eccezioni in caso di input non validi
                 trackToEdit.setTitle(title);
                 trackToEdit.setAuthor(author);
                 trackToEdit.setDuration(duration);
                 trackToEdit.setGenre(genre);
                 trackToEdit.setReleaseYear(year);
-                //Aggiorna la posizione nella lista per notificare la riga della tabella
+
+                // Aggiorna la posizione nella lista per notificare la riga della tabella
                 int index = library.getAllTracks().indexOf(trackToEdit);
                 if (index != -1) {
                     library.getAllTracks().set(index, trackToEdit);
@@ -117,43 +96,52 @@ public class TrackFormController {
                 System.out.println("Traccia modificata con successo!");
             }
             
-            // Ritorna alla schermata principale
+            // Si ritorna alla schermata principale solo se non sono state sollevate eccezioni
             onBackButtonClicked();
-            
+
         } catch (NumberFormatException e) {
-            // Intercettazione dell'errore nel caso l'utente scriva lettere nei campi anno o durata
-            showErrorAlert("Errore di Compilazione", "Controlla l'anno e la durata.");
+            // Intercettazione errori di conversione stringa-numero (es. lettere nel campo durata)
+            showErrorAlert("Errore di Formattazione", "Controlla che anno e durata contengano solo numeri validi.");
+        } catch (IllegalArgumentException e) {
+            // Intercettazione delle eccezioni di business logic sollevate dalla classe Track
+            showErrorAlert("Dati Non Validi", e.getMessage());
         }
     }
 
-    //Scatta quando si clicca sull'icona della freccia per tornare indietro alla schermata principale.
-    @FXML
+    /**
+     * Metodo di supporto (Clean Code) per generare e mostrare un Alert grafico di errore all'utente.
+     * Estrae la logica di creazione UI per mantenere il metodo principale snello e leggibile.
+     * * @param header L'intestazione in grassetto dell'Alert.
+     * @param content Il messaggio di dettaglio dell'errore (spesso catturato dal Modello).
+     */
+    private void showErrorAlert(String header, String content) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle("Errore di Salvataggio");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.getDialogPane().setMinHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
+        alert.showAndWait();
+    }
+
+@FXML
     public void onBackButtonClicked() {
         try {
-            //Ricarichiamo la vista principale della libreria
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/LibraryView.fxml"));
-            Parent root = loader.load();
-            //Recuperiamo il controller associato alla view e gli passiamo le dipendenze necessarie
+            // Ricarichiamo la vista principale tramite la costante (Clean Code)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.LIBRARY_VIEW));
+            Parent view = loader.load();
+
+            // Recuperiamo il controller e gli passiamo il mainController
             LibraryController nextController = loader.getController();
             if (nextController != null) {
-                nextController.setDependencies(this.library, this.primaryStage);
+                nextController.setDependencies(this.library, this.mainController);
             }
-            
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+
+            // Deleghiamo il cambio scena al MainController senza ricaricare tutta la finestra
+            if (this.mainController != null) {
+                this.mainController.setCenterView(view);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    /**
-     * Metodo di supporto per mostrare un Alert di errore standard di JavaFX
-     */
-    private void showErrorAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Errore");
-        alert.setHeaderText(title);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

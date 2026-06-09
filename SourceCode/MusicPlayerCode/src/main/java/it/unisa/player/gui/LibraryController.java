@@ -30,7 +30,7 @@ public class LibraryController {
 
     //Riferimenti allo stato interno e alle dipendenze
     private Library library;
-    private Stage primaryStage;
+    private MainController mainController; 
 
     /**
      * Eseguito automaticamente da JavaFX non appena i file FXML vengono caricati.
@@ -48,9 +48,9 @@ public class LibraryController {
 
 
     //Riceve le istanze dei motori logici dalla classe App e aggiorna la tabella con i dati correnti della libreria
-    public void setDependencies(Library library, Stage primaryStage) {
+    public void setDependencies(Library library, MainController mainController) {
         this.library = library;
-        this.primaryStage = primaryStage;
+        this.mainController = mainController;
 
         if (trackTable != null && library != null) {
             trackTable.setItems(library.getAllTracks());
@@ -109,19 +109,20 @@ public class LibraryController {
                     Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
                     if (selectedTrack != null) {
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/AddTrackView.fxml"));
-                            Parent root = loader.load();
-                            
-                            //Recuperiamo il controller del form e gli passiamo le dipendenze necessarie
+                            // Uso della costante al posto della stringa hard-coded
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.ADD_TRACK_VIEW));
+                            Parent view = loader.load();
+
                             TrackFormController formController = loader.getController();
                             if (formController != null) {
-                                formController.setDependencies(this.library, this.primaryStage);
-                                // Passiamo la traccia: il formController si occuperà di pre-compilarsi
+                                // Passiamo mainController al posto di primaryStage
+                                formController.setDependencies(LibraryController.this.library, LibraryController.this.mainController);
                                 formController.setTrackToEdit(selectedTrack);
                             }
-                            
-                            if (primaryStage != null && primaryStage.getScene() != null) {
-                                primaryStage.getScene().setRoot(root);
+
+                            // Deleghiamo il cambio di vista al MainController
+                            if (LibraryController.this.mainController != null) {
+                                LibraryController.this.mainController.setCenterView(view);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -132,47 +133,39 @@ public class LibraryController {
         }
     }
 
- @FXML
+//Scatta quando si clicca sul pulsante "+" di aggiunta traccia.
+    @FXML
     public void onAddTrackClick() {
         try {
-            //Carica la vista del form di aggiunta traccia
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/AddTrackView.fxml"));
-            Parent root = loader.load();
-            
-            //Recuperiamo il controller del form e gli passiamo le dipendenze necessarie
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.ADD_TRACK_VIEW));
+            Parent view = loader.load();
             TrackFormController formController = loader.getController();
-            if (formController != null) {
-                // Passiamo le dipendenze al controller del form dedicatogli
-                formController.setDependencies(this.library, this.primaryStage);
-            }
             
-            //Mostriamo la vista del form al posto della vista principale
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+            if (formController != null) {
+                formController.setDependencies(this.library, this.mainController);
+            }
+            if (this.mainController != null) {
+                this.mainController.setCenterView(view);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Errore nel caricamento di AddTrackView.fxml: " + e.getMessage());
+            System.err.println("Errore nel caricamento di AddTrackView.fxml");
         }
     }
-
 
     //rimanda a playlist viewer (task 14.3)
     @FXML
     public void onViewPlaylistsClick() {
         try {
-            // Carichiamo la playlist 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/PlaylistView.fxml"));
-            Parent root = loader.load();
-            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.PLAYLIST_VIEW));
+            Parent view = loader.load();
             PlaylistController targetController = loader.getController();
-            if (targetController != null) {
-                targetController.setDependencies(this.library, this.primaryStage);
-            }
             
-            // Cambiamo la scena
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+            if (targetController != null) {
+                targetController.setDependencies(this.library, this.mainController);
+            }
+            if (this.mainController != null) {
+                this.mainController.setCenterView(view);
             }
         } catch (Exception e) {
             e.printStackTrace();

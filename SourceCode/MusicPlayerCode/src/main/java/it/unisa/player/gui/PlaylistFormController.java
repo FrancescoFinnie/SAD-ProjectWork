@@ -14,28 +14,30 @@ public class PlaylistFormController {
     @FXML private TextField nameField;
     @FXML private Label errorLabel;
 
+
     private Library library;
-    private Stage primaryStage;
+    private MainController mainController;
 
     private Playlist playlistToEdit;
 
-    public void setDependencies(Library library, Stage primaryStage) {
-        this.library = library;
-        this.primaryStage = primaryStage;
+    public void setDependencies(Library library, MainController mainController) {
+        setDependencies(library, null, mainController); // Richiama il metodo principale passando null
     }
 
     /**
      * Iniezione dipendenze principale (Supporta sia Creazione che Modifica).
      */
-    public void setDependencies(Library library, Playlist playlistToEdit, Stage primaryStage) {
+    public void setDependencies(Library library, Playlist playlistToEdit, MainController mainController) {
         this.library = library;
         this.playlistToEdit = playlistToEdit;
-        this.primaryStage = primaryStage;
+        this.mainController = mainController;
 
-        // Task 11.3: Logica di auto-compilazione. Se stiamo modificando, riempiamo il campo col vecchio nome
+        //Logica di auto-compilazione. Se stiamo modificando, riempiamo il campo col vecchio nome
         if (this.playlistToEdit != null) {
             nameField.setText(this.playlistToEdit.getName());
         }
+
+
     }
 
     @FXML
@@ -78,18 +80,24 @@ public class PlaylistFormController {
         goBackToPlaylists();
     }
 
-        private void goBackToPlaylists() {
+    @FXML
+    public void onBackButtonClicked() {
+        goBackToPlaylists(); // Tasto indietro ←
+    }
+
+    private void goBackToPlaylists() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/unisa/player/gui/PlaylistView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewConstants.PLAYLIST_VIEW));
             Parent root = loader.load();
             
             PlaylistController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.primaryStage);
+                targetController.setDependencies(this.library, this.mainController);
             }
             
-            if (primaryStage != null && primaryStage.getScene() != null) {
-                primaryStage.getScene().setRoot(root);
+
+            if (this.mainController != null) {
+                this.mainController.setCenterView(root);
             }
         } catch (Exception e) {
             e.printStackTrace();

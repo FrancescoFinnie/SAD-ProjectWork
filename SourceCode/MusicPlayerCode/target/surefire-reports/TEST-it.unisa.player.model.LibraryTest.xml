@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="it.unisa.player.model.LibraryTest" time="0.185" tests="2" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="it.unisa.player.model.LibraryTest" time="0.008" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="16"/>
+    <property name="javafx.runtime.version" value="13+14"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
     <property name="java.class.path" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\test-classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\edoar\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;"/>
@@ -10,12 +11,13 @@
     <property name="user.variant" value=""/>
     <property name="java.vendor.url" value="https://java.oracle.com/"/>
     <property name="user.timezone" value="Europe/Rome"/>
+    <property name="javafx.version" value="13"/>
     <property name="os.name" value="Windows 10"/>
     <property name="java.vm.specification.version" value="16"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="IT"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-16.0.2\bin"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\edoar\AppData\Local\Temp\surefire354702859192420142 2026-06-09T18-54-24_192-jvmRun1 surefire-20260609185425160_1tmp surefire_0-20260609185425160_2tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\edoar\AppData\Local\Temp\surefire15613203341260468048 2026-06-10T22-26-16_493-jvmRun1 surefire-20260610222617115_1tmp surefire_0-20260610222617115_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\test-classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\edoar\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -56,6 +58,6 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="60.0"/>
   </properties>
-  <testcase name="testRemovePlaylist" classname="it.unisa.player.model.LibraryTest" time="0.147"/>
-  <testcase name="testAddPlaylistWithoutDuplicates" classname="it.unisa.player.model.LibraryTest" time="0.003"/>
+  <testcase name="testRemovePlaylist" classname="it.unisa.player.model.LibraryTest" time="0.002"/>
+  <testcase name="testAddPlaylistWithoutDuplicates" classname="it.unisa.player.model.LibraryTest" time="0.002"/>
 </testsuite>

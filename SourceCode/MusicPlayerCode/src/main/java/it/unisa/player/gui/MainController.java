@@ -1,7 +1,8 @@
 package it.unisa.player.gui;
 
 import javafx.scene.Node;
-
+import it.unisa.player.engine.PlaybackEngine;
+import it.unisa.player.engine.PlayingState;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.Button;
@@ -16,7 +17,10 @@ import javafx.scene.control.ProgressBar;
  */
 public class MainController {
 
+    private PlaybackEngine engine;
 
+    // Variabile booleana per tenere traccia dello stato del loop (US22)
+    private boolean isLoopActive = false;
     // --- Contenitore Radice ---
     @FXML
     private BorderPane rootPane;
@@ -28,6 +32,12 @@ public class MainController {
     private Label currentAuthorLabel;
     @FXML
     private ProgressBar songProgressBar;
+
+    @FXML
+    private Label timeElapsedLabel;
+    @FXML
+    private Label timeTotalLabel;
+
     // Pulsanti di Riproduzione
     @FXML
     private Button playButton;
@@ -47,8 +57,68 @@ public class MainController {
      */
     @FXML
     public void initialize() {
-        // La UI persistente è caricata. 
-        // In futuro qui agganceremo i Listener dello State Pattern e della Timeline.
+        this.engine = PlaybackEngine.getInstance();
+
+        // Ascolta il cambio traccia per aggiornare i testi
+        engine.currentTrackProperty().addListener((observable, oldTrack, newTrack) -> {
+            if (newTrack != null) {
+                currentTrackLabel.setText(newTrack.getTitle());
+                currentAuthorLabel.setText(newTrack.getAuthor());
+            } else {
+                currentTrackLabel.setText("Nessun brano in riproduzione");
+                currentAuthorLabel.setText("-");
+            }
+        });
+
+        // Ascolta il cambio di stato per nascondere/mostrare i pulsanti (Play/Pause Swap)
+        engine.stateProperty().addListener((observable, oldState, newState) -> {
+            if (newState instanceof PlayingState) {
+                // Se è in riproduzione: nascondi il Play, mostra la Pausa
+                playButton.setVisible(false);
+                playButton.setManaged(false);
+                
+                pauseButton.setVisible(true);
+                pauseButton.setManaged(true);
+            } else {
+                // Se è in Pausa o Stop: mostra il Play, nascondi la Pausa
+                playButton.setVisible(true);
+                playButton.setManaged(true);
+                
+                pauseButton.setVisible(false);
+                pauseButton.setManaged(false);
+            }
+        });
+
+        // Colleghiamo la ProgressBar della UI al calcolo del tempo nel Motore
+        if (songProgressBar != null) {
+            songProgressBar.progressProperty().bind(engine.progressProperty());
+        }
+
+                //Per il tempo trascorso 
+        engine.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (timeElapsedLabel != null) {
+                int secondi = newTime.intValue();
+                timeElapsedLabel.setText(String.format("%02d:%02d", secondi / 60, secondi % 60));
+            }
+        });
+        //Per la durata totale del brano
+        engine.totalDurationProperty().addListener((obs, oldTime, newTime) -> {
+            if (timeTotalLabel != null) {
+                int secondi = newTime.intValue();
+                timeTotalLabel.setText(String.format("%02d:%02d", secondi / 60, secondi % 60));
+            }
+        });
+
+        // Stato visivo iniziale dei bottoni coerente con lo stato iniziale (Fermo/Stop)
+        playButton.setVisible(true);
+        playButton.setManaged(true);
+        
+        pauseButton.setVisible(false);
+        pauseButton.setManaged(false);
+        
+        // Inizializza visivamente a "00:00" se le etichette sono collegate (US23)
+        if (timeElapsedLabel != null) timeElapsedLabel.setText("00:00");
+        if (timeTotalLabel != null) timeTotalLabel.setText("00:00");
     }
 
     /**
@@ -69,4 +139,81 @@ public class MainController {
             System.err.println("Errore di Navigazione: rootPane non inizializzato o vista nulla.");
         }
     }
+
+    
+
+    // Delega eventi UI per Play e Pausa.
+    @FXML
+    private void handlePlayClick() {
+        engine.pressPlay();
+    }
+
+    @FXML
+    private void handlePauseClick() {
+        engine.pressPause();
+    }
+
+    @FXML
+    private void handleSkipClick() {
+        engine.playNext();
+    }
+
+    // Variabile booleana per tenere traccia dello stato (acceso/spento)
+    private boolean isShuffleActive = false;
+
+    /**
+     * Gestisce il click sul pulsante Shuffle
+     */
+    @FXML
+    private void handleShuffleClick() {
+        //Inverti lo stato 
+        isShuffleActive = !isShuffleActive;
+
+        // Mutua Esclusione : Se attiviamo lo Shuffle, disattiviamo il Loop Singolo sia nel motore che nella grafica
+        if (isShuffleActive && isLoopActive) {
+            isLoopActive = false;
+            engine.setLoopSingleTrackActive(false);
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+        
+        //Delega al motore il cambio di Iterator a caldo
+        engine.enableShuffle(isShuffleActive);
+        
+        //Feedback Visivo: Cambia colore al bottone per far capire all'utente che è attivo
+        if (isShuffleActive) {
+            // Verde per indicare Shuffle ON
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #1db954; -fx-font-size: 16px; -fx-cursor: hand;");
+        } else {
+            // Nero per indicare Shuffle OFF
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+    }
+
+    @FXML
+    private void handleLoopClick() {
+        // Inverte lo stato attivo/disattivo
+        isLoopActive = !isLoopActive;
+        
+        // mutua esclusione: Se attiviamo il Loop Singolo, disattiviamo lo Shuffle sia nel motore che nella grafica
+        if (isLoopActive && isShuffleActive) {
+            isShuffleActive = false;
+            engine.enableShuffle(false); // Ripristina l'iteratore sequenziale
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+        
+        // Delega al motore l'attivazione/disattivazione del flag condizionale
+        engine.setLoopSingleTrackActive(isLoopActive);
+        
+        // Cambia colore al bottone se attivo
+        if (isLoopActive) {
+            // Verde per indicare Loop ON
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #1db954; -fx-font-size: 16px; -fx-cursor: hand;");
+        } else {
+            // Nero per indicare Loop OFF
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+    }
+
+    
+
 }

@@ -14,14 +14,19 @@ public class PlaylistFormController {
     @FXML private TextField nameField;
     @FXML private Label errorLabel;
 
+    @FXML private Label titleLabel; // Mappa la Label del titolo presente nel file FXML
+
 
     private Library library;
     private MainController mainController;
 
     private Playlist playlistToEdit;
 
+/**
+     * Iniezione dipendenze per CREAZIONE (Aggiungi Playlist).
+     */
     public void setDependencies(Library library, MainController mainController) {
-        setDependencies(library, null, mainController); // Richiama il metodo principale passando null
+        setDependencies(library, null, mainController); // Richiama il metodo sottostante passando null
     }
 
     /**
@@ -32,12 +37,23 @@ public class PlaylistFormController {
         this.playlistToEdit = playlistToEdit;
         this.mainController = mainController;
 
-        //Logica di auto-compilazione. Se stiamo modificando, riempiamo il campo col vecchio nome
         if (this.playlistToEdit != null) {
-            nameField.setText(this.playlistToEdit.getName());
+            // --- MODALITÀ MODIFICA ---
+            if (titleLabel != null) {
+                titleLabel.setText("Modifica Playlist"); // Cambia la scritta dell'interfaccia
+            }
+            if (nameField != null) {
+                nameField.setText(this.playlistToEdit.getName()); // Riempe il campo col vecchio nome
+            }
+        } else {
+            // --- MODALITÀ CREAZIONE ---
+            if (titleLabel != null) {
+                titleLabel.setText("Aggiungi Playlist"); // Ripristina la scritta originale
+            }
+            if (nameField != null) {
+                nameField.clear(); // Svuota il campo di testo
+            }
         }
-
-
     }
 
     @FXML

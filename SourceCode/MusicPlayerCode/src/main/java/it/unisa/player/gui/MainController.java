@@ -18,6 +18,9 @@ import javafx.scene.control.ProgressBar;
 public class MainController {
 
     private PlaybackEngine engine;
+
+    // Variabile booleana per tenere traccia dello stato del loop (US22)
+    private boolean isLoopActive = false;
     // --- Contenitore Radice ---
     @FXML
     private BorderPane rootPane;
@@ -117,5 +120,63 @@ public class MainController {
     private void handleSkipClick() {
         engine.playNext();
     }
+
+    // Variabile booleana per tenere traccia dello stato (acceso/spento)
+    private boolean isShuffleActive = false;
+
+    /**
+     * Gestisce il click sul pulsante Shuffle
+     */
+    @FXML
+    private void handleShuffleClick() {
+        //Inverti lo stato 
+        isShuffleActive = !isShuffleActive;
+
+        // Mutua Esclusione : Se attiviamo lo Shuffle, disattiviamo il Loop Singolo sia nel motore che nella grafica
+        if (isShuffleActive && isLoopActive) {
+            isLoopActive = false;
+            engine.setLoopSingleTrackActive(false);
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+        
+        //Delega al motore il cambio di Iterator a caldo
+        engine.enableShuffle(isShuffleActive);
+        
+        //Feedback Visivo: Cambia colore al bottone per far capire all'utente che è attivo
+        if (isShuffleActive) {
+            // Verde per indicare Shuffle ON
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #1db954; -fx-font-size: 16px; -fx-cursor: hand;");
+        } else {
+            // Nero per indicare Shuffle OFF
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+    }
+
+    @FXML
+    private void handleLoopClick() {
+        // Inverte lo stato attivo/disattivo
+        isLoopActive = !isLoopActive;
+        
+        // mutua esclusione: Se attiviamo il Loop Singolo, disattiviamo lo Shuffle sia nel motore che nella grafica
+        if (isLoopActive && isShuffleActive) {
+            isShuffleActive = false;
+            engine.enableShuffle(false); // Ripristina l'iteratore sequenziale
+            shuffleButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+        
+        // Delega al motore l'attivazione/disattivazione del flag condizionale
+        engine.setLoopSingleTrackActive(isLoopActive);
+        
+        // Cambia colore al bottone se attivo
+        if (isLoopActive) {
+            // Verde per indicare Loop ON
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #1db954; -fx-font-size: 16px; -fx-cursor: hand;");
+        } else {
+            // Nero per indicare Loop OFF
+            loopButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;");
+        }
+    }
+
+    
 
 }

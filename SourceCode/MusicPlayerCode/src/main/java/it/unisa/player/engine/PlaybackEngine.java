@@ -137,6 +137,32 @@ public class PlaybackEngine {
         }
     }
 
+    public void setIterator(Iterator newIterator) {
+        this.iterator = newIterator;
+    }
+
+    public void enableShuffle(boolean enable) {
+        // Se non c'è una collezione attiva o la coda è vuota, si ferma
+        if (currentCollection == null || queue.isEmpty()) return;
+        
+        // Trova l'indice del brano attuale guardando la coda della UI
+        int currentIndex = queue.indexOf(getCurrentTrack());
+        if (currentIndex < 0) currentIndex = 0;
+        
+        if (enable) {
+            //Genera l'iteratore tramite Factory Method della collezione
+            Iterator newIter = currentCollection.createShuffleIterator(currentIndex);
+            newIter.next(); // Consuma la traccia attuale per allineamento
+            setIterator(newIter);
+            System.out.println("Modalità Shuffle Attivata.");
+        } else {
+            //Genera l'iteratore tramite Factory Method della collezione
+            Iterator newIter = currentCollection.createSequentialIterator(currentIndex);
+            newIter.next(); // Consuma la traccia attuale per allineamento
+            setIterator(newIter);
+            System.out.println("Modalità Sequenziale Ripristinata.");
+        }
+    }
 
     public void playNext() {
         if (iterator != null && iterator.hasNext()) {
@@ -208,6 +234,18 @@ public class PlaybackEngine {
         if (playbackTimer != null) {
             playbackTimer.stop();
         }
+    }
+
+    // flag per la modalità Loop Traccia Singola (US22)
+    private boolean isLoopSingleTrackActive = false;
+
+    public void setLoopSingleTrackActive(boolean active) {
+        this.isLoopSingleTrackActive = active;
+        System.out.println("Modalità Loop Singolo: " + (active ? "ATTIVATA" : "DISATTIVATA"));
+    }
+
+    public boolean isLoopSingleTrackActive() {
+        return isLoopSingleTrackActive;
     }
 
 }

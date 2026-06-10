@@ -1,0 +1,4 @@
+--patch-module
+musicplayer=_
+--add-reads
+musicplayer=ALL-UNNAMED

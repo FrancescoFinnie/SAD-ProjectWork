@@ -192,6 +192,20 @@ public class PlaybackEngine {
 
     private final IntegerProperty currentTimeProperty = new SimpleIntegerProperty(0);
 
+    // --- INIZIO AGGIUNTA: Getters per le JavaFX Properties (US23) ---
+    public DoubleProperty progressProperty() {
+        return progressProperty;
+    }
+
+    public IntegerProperty currentTimeProperty() {
+        return currentTimeProperty;
+    }
+
+    public IntegerProperty totalDurationProperty() {
+        return totalDurationProperty;
+    }
+    // --- FINE AGGIUNTA ---
+
     public void resetTimer() {
         this.currentTimeProperty.set(0);
         this.progressProperty.set(0.0);
@@ -202,6 +216,8 @@ public class PlaybackEngine {
     // Se il brano termina (secondi >= durata), invoca playNext().
 
     private Timeline playbackTimer;
+
+    private final IntegerProperty totalDurationProperty = new SimpleIntegerProperty(0);
 
     public void startSimulationTimer() {
         if (playbackTimer != null) playbackTimer.stop();
@@ -217,6 +233,13 @@ public class PlaybackEngine {
                 int trackDuration = current.getDuration();
                 if (trackDuration <= 0) trackDuration = 1; 
                 
+                // Aggiorna la durata totale (per sicurezza ogni tick o quando cambia la traccia)
+                totalDurationProperty.set(trackDuration);
+
+                // Aggiorna la barra
+                double percentCompleted = (double) currentSecs / trackDuration;
+                progressProperty.set(percentCompleted);
+
                 System.out.println("Riproduzione... " + currentSecs + "s / " + trackDuration + "s (" + current.getTitle() + ")");
                 
                 if (currentSecs >= trackDuration) {

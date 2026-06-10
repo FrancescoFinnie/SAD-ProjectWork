@@ -32,6 +32,12 @@ public class MainController {
     private Label currentAuthorLabel;
     @FXML
     private ProgressBar songProgressBar;
+
+    @FXML
+    private Label timeElapsedLabel;
+    @FXML
+    private Label timeTotalLabel;
+
     // Pulsanti di Riproduzione
     @FXML
     private Button playButton;
@@ -82,6 +88,37 @@ public class MainController {
                 pauseButton.setManaged(false);
             }
         });
+
+        // Colleghiamo la ProgressBar della UI al calcolo del tempo nel Motore
+        if (songProgressBar != null) {
+            songProgressBar.progressProperty().bind(engine.progressProperty());
+        }
+
+                //Per il tempo trascorso 
+        engine.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (timeElapsedLabel != null) {
+                int secondi = newTime.intValue();
+                timeElapsedLabel.setText(String.format("%02d:%02d", secondi / 60, secondi % 60));
+            }
+        });
+        //Per la durata totale del brano
+        engine.totalDurationProperty().addListener((obs, oldTime, newTime) -> {
+            if (timeTotalLabel != null) {
+                int secondi = newTime.intValue();
+                timeTotalLabel.setText(String.format("%02d:%02d", secondi / 60, secondi % 60));
+            }
+        });
+
+        // Stato visivo iniziale dei bottoni coerente con lo stato iniziale (Fermo/Stop)
+        playButton.setVisible(true);
+        playButton.setManaged(true);
+        
+        pauseButton.setVisible(false);
+        pauseButton.setManaged(false);
+        
+        // Inizializza visivamente a "00:00" se le etichette sono collegate (US23)
+        if (timeElapsedLabel != null) timeElapsedLabel.setText("00:00");
+        if (timeTotalLabel != null) timeTotalLabel.setText("00:00");
     }
 
     /**

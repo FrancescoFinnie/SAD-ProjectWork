@@ -74,9 +74,23 @@ private void setupTableInteractions() {
                     deleteBtn.setOnAction(event -> {
                         Track track = getTableView().getItems().get(getIndex());
                         
-                        if (LibraryController.this.library != null) {
-                            LibraryController.this.library.removeTrack(track);
-                            System.out.println("Traccia eliminata: " + track.getTitle());
+                        //Aggiunta alert di conferma 
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Conferma Eliminazione");
+                        alert.setHeaderText("Eliminare definitivamente il brano?");
+                        alert.setContentText("Sei sicuro di voler eliminare \"" + track.getTitle() + "\" di " + track.getAuthor() + " dalla libreria?");
+                        
+                        // Mostra l'alert e attende la risposta dell'utente (OK o ANNULLA)
+                        Optional<ButtonType> result = alert.showAndWait();
+                        
+                        // Se l'utente clicca su OK, procediamo all'eliminazione
+                        if (result.isPresent() && result.get() == ButtonType.OK) {
+                            if (LibraryController.this.library != null) {
+                                LibraryController.this.library.removeTrack(track);
+                                System.out.println("Traccia eliminata con successo: " + track.getTitle());
+                            }
+                        } else {
+                            System.out.println("Eliminazione annullata dall'utente per il brano: " + track.getTitle());
                         }
                     });
                 }

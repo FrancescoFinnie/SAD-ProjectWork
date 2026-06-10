@@ -86,7 +86,7 @@ public class PlaybackEngine {
     // Avvio riproduzione da libreria.
     // Svuota/popola la queue, crea un SequentialIterator a partire dall'indice fornito e invoca la riproduzione.
     public void playFromLibrary(Library library, int startIndex) {
-        //this.currentPlaylistContext = null; 
+        this.currentPlaylistContext = null; 
         this.currentCollection = library; // Salva la collezione corrente
 
         this.queue.clear();
@@ -219,10 +219,14 @@ public class PlaybackEngine {
                 
                 System.out.println("Riproduzione... " + currentSecs + "s / " + trackDuration + "s (" + current.getTitle() + ")");
                 
-                // Implementazione esatta del Task 20.1
                 if (currentSecs >= trackDuration) {
+                    if (isLoopSingleTrackActive) {
+                        System.out.println("Loop attivo! Faccio ripartire il brano corrente");
+                        resetTimer();
+                    } else {
                     System.out.println("Traccia finita! Passo in automatico alla successiva...");
                     playNext(); 
+                    }
                 }
             }
         }));

@@ -19,6 +19,7 @@ public class PlaybackEngineTest {
     private PlaybackEngine engine;
     private List<Track> testTracks;
     private Playlist mockPlaylist;
+    private it.unisa.player.model.Library mockLibrary;
 
 
     // Inizializzazione Toolkit JavaFX per Timeline.
@@ -48,6 +49,10 @@ public class PlaybackEngineTest {
         mockPlaylist = new Playlist("Playlist Test");
         mockPlaylist.addTrack(t1);
         mockPlaylist.addTrack(t2);
+
+        mockLibrary = new it.unisa.player.model.Library();
+        mockLibrary.addTrack(t1);
+        mockLibrary.addTrack(t2);
     }
 
 
@@ -57,6 +62,7 @@ public class PlaybackEngineTest {
     @Test
     public void testPlayFromLibrary() {
 
+        engine.playFromLibrary(mockLibrary, 0);
         // Verifica 1: La coda è stata popolata
         assertEquals(2, engine.getQueue().size(), "La coda deve contenere esattamente 2 brani.");
         

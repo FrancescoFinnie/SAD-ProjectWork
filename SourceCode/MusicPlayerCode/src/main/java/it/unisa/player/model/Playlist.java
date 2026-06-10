@@ -1,6 +1,7 @@
 package it.unisa.player.model;
 
 import it.unisa.player.engine.SequentialIterator;
+import it.unisa.player.engine.ShuffleIterator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import it.unisa.player.engine.Iterator;
@@ -56,12 +57,12 @@ public class Playlist implements IterableCollection {
 
     @Override
     public Iterator createSequentialIterator(int startIndex) {
-        return new SequentialIterator(this.getTracks(), startIndex);
+        return new SequentialIterator(this.tracks, startIndex);
     }
 
     @Override
     public Iterator createShuffleIterator(int startIndex) {
-        return null; 
+        return new ShuffleIterator(this.tracks, startIndex); 
     }
 
 

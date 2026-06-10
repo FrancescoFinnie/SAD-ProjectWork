@@ -28,13 +28,13 @@
             </VBox>
             
             <HBox spacing="22" alignment="CENTER">
-                <Button fx:id="shuffleButton"  text="🔀" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
+                <Button fx:id="shuffleButton" onAction="#handleShuffleClick"  text="🔀" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
                 
                 <Button fx:id="playButton" onAction="#handlePlayClick" text="▶" style="-fx-background-color: white; -fx-text-fill: black; -fx-font-size: 14px; -fx-background-radius: 50em; -fx-min-width: 36px; -fx-min-height: 36px; -fx-cursor: hand;"/>
                 <Button fx:id="pauseButton" onAction="#handlePauseClick" text="⏸" visible="false" managed="false" style="-fx-background-color: white; -fx-text-fill: black; -fx-font-size: 14px; -fx-background-radius: 50em; -fx-min-width: 36px; -fx-min-height: 36px; -fx-cursor: hand;"/>
                 
                 <Button fx:id="skipButton" onAction="#handleSkipClick" text="⏭" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
-                <Button fx:id="loopButton"  text="🔁" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
+                <Button fx:id="loopButton" onAction="#handleLoopClick"  text="🔁" style="-fx-background-color: transparent; -fx-text-fill: #000000; -fx-font-size: 16px; -fx-cursor: hand;"/>
             </HBox>
             
         </VBox>

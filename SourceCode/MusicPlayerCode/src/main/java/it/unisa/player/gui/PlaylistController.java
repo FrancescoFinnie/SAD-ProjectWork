@@ -9,6 +9,8 @@ import it.unisa.player.engine.PlaybackEngine;
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Playlist;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -92,7 +94,7 @@ public class PlaylistController {
             });
         }
 
-        // --- Task 11.2: Configurazione Colonna Modifica (Pulsante "✎") ---
+        // Configurazione Colonna Modifica (Pulsante "✎") ---
         if (editColumn != null) {
             editColumn.setCellFactory(param -> new TableCell<Playlist, Void>() {
                 
@@ -123,7 +125,7 @@ public class PlaylistController {
             });
         }
 
-        // --- INTEGRAZIONE US13: Doppio click per aprire il dettaglio della playlist task 13.3---
+        // Doppio click per aprire il dettaglio della playlist 
         if (playlistTable != null) {
             playlistTable.setRowFactory(tv -> {
                 javafx.scene.control.TableRow<Playlist> row = new javafx.scene.control.TableRow<>();
@@ -185,7 +187,18 @@ public class PlaylistController {
         this.commandManager = commandManager;
         // Popola la tabella con le playlist
         if (playlistTable != null && library != null) {
-            playlistTable.setItems(library.getPlaylists());
+            //  Classifica automatica per le Playlist
+            SortedList<Playlist> sortedPlaylists = new SortedList<>(library.getPlaylists());
+            sortedPlaylists.setComparator((p1, p2) -> Integer.compare(p2.getPlayCount(), p1.getPlayCount()));
+            playlistTable.setItems(sortedPlaylists);
+            
+            // Aggiornamento Live al termine di ogni riproduzione
+            PlaybackEngine.getInstance().totalPlaysProperty().addListener((obs, oldVal, newVal) -> {
+                Platform.runLater(() -> {
+                    playlistTable.refresh();
+                    sortedPlaylists.setComparator((p1, p2) -> Integer.compare(p2.getPlayCount(), p1.getPlayCount()));
+                });
+            });
         }
     }
     
@@ -235,8 +248,8 @@ public class PlaylistController {
         }
     }
 
-        /**
-     * [Task 11.2] Carica il form in modalità Modifica per la playlist selezionata.
+    /**
+     *  Carica il form in modalità Modifica per la playlist selezionata.
      */
     private void openPlaylistFormForEdit(Playlist playlist) {
         try {

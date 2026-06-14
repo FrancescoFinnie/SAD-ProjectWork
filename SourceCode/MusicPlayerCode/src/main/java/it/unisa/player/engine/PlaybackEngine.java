@@ -52,10 +52,21 @@ public class PlaybackEngine {
         this.stateProperty = new SimpleObjectProperty<>(new StoppedState(this));
         this.progressProperty = new SimpleDoubleProperty(0.0);
         
-        // Ascoltatore automatico. Ogni volta che la canzone cambia, 
+        // Ascoltatore automatico.
+        // Ogni volta che la canzone cambia, 
         // azzeriamo il timer per evitare che riparta dal tempo della canzone precedente.
         this.currentTrack.addListener((observable, oldTrack, newTrack) -> {
             resetTimer();
+            
+            // --- Sincronizzazione Statistiche ---
+            if (newTrack != null) {
+                newTrack.incrementPlayCount();
+                // Se la riproduzione è partita dal contesto di una playlist, incrementiamo anche quella
+                if (this.currentPlaylistContext != null) {
+                    this.currentPlaylistContext.incrementPlayCount();
+                }
+            }
+
         });
     }
 
@@ -84,8 +95,11 @@ public class PlaybackEngine {
     public PlayerState getState() { return this.stateProperty.get(); }
     public ObjectProperty<PlayerState> stateProperty() { return stateProperty; }
 
-    public void pressPlay() { this.getState().play(this); }
-    public void pressPause() { this.getState().pause(this); }
+    public void pressPlay() { 
+        if (this.currentTrack.get() != null) { // Impedisce avvii accidentali se la coda è finita
+            this.getState().play(this);
+        }
+    }    public void pressPause() { this.getState().pause(this); }
     public void pressStop() { this.getState().stop(this); }
 
     private ListChangeListener<Track> collectionListener;
@@ -239,6 +253,8 @@ public class PlaybackEngine {
                 skipToNextPlaylist();
             } else {
                 this.pressStop();
+                this.resetTimer();           // Azzera la barra e il testo
+                this.currentTrack.set(null); // Sgancia la traccia, impedendo il re-play
             }
         }
     }
@@ -284,7 +300,11 @@ public class PlaybackEngine {
 
     private final IntegerProperty currentTimeProperty = new SimpleIntegerProperty(0);
 
-    // --- INIZIO AGGIUNTA: Getters per le JavaFX Properties (US23) ---
+    // Proprietà che scatta ogni volta che una canzone termina, utilissima per avvisare la GUI di aggiornare le classifiche!
+    private final IntegerProperty totalPlaysProperty = new SimpleIntegerProperty(0);
+    public IntegerProperty totalPlaysProperty() { return totalPlaysProperty; }
+
+    // --- INIZIO AGGIUNTA: Getters per le JavaFX Properties ---
     public DoubleProperty progressProperty() {
         return progressProperty;
     }
@@ -313,35 +333,45 @@ public class PlaybackEngine {
 
     public void startSimulationTimer() {
         if (playbackTimer != null) playbackTimer.stop();
-        
         playbackTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             
-            // Incrementa i secondi passati (usando la property già presente in classe)
+            Track current = getCurrentTrack();
+            if (current == null) {
+                stopSimulationTimer();
+                return;
+            }
+
+            // Incrementa i secondi passati
             currentTimeProperty.set(currentTimeProperty.get() + 1);
             int currentSecs = currentTimeProperty.get();
             
-            Track current = getCurrentTrack();
-            if (current != null) {
-                int trackDuration = current.getDuration();
-                if (trackDuration <= 0) trackDuration = 1; 
-                
-                // Aggiorna la durata totale (per sicurezza ogni tick o quando cambia la traccia)
-                totalDurationProperty.set(trackDuration);
+            int trackDuration = current.getDuration();
+            if (trackDuration <= 0) trackDuration = 1; 
+            
+            totalDurationProperty.set(trackDuration);
 
-                // Aggiorna la barra
-                double percentCompleted = (double) currentSecs / trackDuration;
-                progressProperty.set(percentCompleted);
+            // Blindatura ANTI-OVERFLOW (es. impedisce di mostrare 2:51 / 2:50)
+            if (currentSecs > trackDuration) currentSecs = trackDuration;
 
-                System.out.println("Riproduzione... " + currentSecs + "s / " + trackDuration + "s (" + current.getTitle() + ")");
+            // Aggiorna la barra
+            double percentCompleted = (double) currentSecs / trackDuration;
+            progressProperty.set(percentCompleted);
+            
+            if (currentSecs >= trackDuration) {
+                System.out.println("Traccia completata. Incremento statistiche...");
                 
-                if (currentSecs >= trackDuration) {
-                    if (isLoopSingleTrackActive) {
-                        System.out.println("Loop attivo! Faccio ripartire il brano corrente");
-                        resetTimer();
-                    } else {
-                    System.out.println("Traccia finita! Passo in automatico alla successiva...");
+                // Incremento effettivo delle statistiche a fine brano ---
+                current.incrementPlayCount(); 
+                if (currentPlaylistContext != null) currentPlaylistContext.incrementPlayCount();
+                
+                // Trigger per avvisare i Controller grafici di riordinare la tabella
+                totalPlaysProperty.set(totalPlaysProperty.get() + 1); 
+
+                if (isLoopSingleTrackActive) {
+                    System.out.println("Loop attivo! Faccio ripartire il brano corrente");
+                    resetTimer();
+                } else {
                     playNext(); 
-                    }
                 }
             }
         }));
@@ -355,7 +385,7 @@ public class PlaybackEngine {
         }
     }
 
-    // flag per la modalità Loop Traccia Singola (US22)
+    // flag per la modalità Loop Traccia Singola 
     private boolean isLoopSingleTrackActive = false;
 
     public void setLoopSingleTrackActive(boolean active) {

@@ -132,4 +132,39 @@ public class TrackTest {
         }, "Un anno nel futuro rispetto al sistema deve sollevare IllegalArgumentException");
     }
 
+    /**
+     * Verifica il corretto funzionamento dei contatori statistici e dei Tag (US26, US28).
+     */
+    @Test
+    public void testPlayCountAndTagsSuccess() {
+        Track testTrack = new Track("Stat Test", "Autore", 120, "Pop", 2022);
+        
+        // Test PlayCount iniziale e incremento
+        assertEquals(0, testTrack.getPlayCount(), "Il contatore iniziale deve essere 0");
+        testTrack.incrementPlayCount();
+        assertEquals(1, testTrack.getPlayCount(), "Il contatore deve salire a 1 dopo un incremento");
+        
+        // Test Gestione Tag
+        testTrack.addTag("favourite");
+        assertTrue(testTrack.hasTag("favourite"), "Il tag deve risultare assegnato");
+        
+        // Test rimozione Tag
+        assertTrue(testTrack.removeTag("favourite"), "La rimozione di un tag esistente deve restituire true");
+        assertFalse(testTrack.hasTag("favourite"), "Il tag non deve più essere presente");
+        assertFalse(testTrack.removeTag("inesistente"), "Rimuovere un tag non assegnato deve restituire false");
+    }
+
+    /**
+     * Verifica il corretto funzionamento dei contatori statistici della playlist (US26).
+     */
+    @Test
+    public void testPlaylistPlayCountSuccess() {
+        Playlist p = new Playlist("Stat Playlist Test");
+        
+        assertEquals(0, p.getPlayCount(), "Il contatore iniziale della playlist deve essere 0");
+        p.incrementPlayCount();
+        assertEquals(1, p.getPlayCount(), "Il contatore della playlist deve salire a 1");
+    }
+
+
 }

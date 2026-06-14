@@ -17,7 +17,17 @@
 
     <VBox spacing="5.0">
         <Label text="Nome Playlist" style="-fx-font-weight: bold;" />
-        <TextField fx:id="nameField" promptText="Nome Playlist" style="-fx-background-color: #f0f0f0; -fx-pref-height: 40;" />
+        <TextField fx:id="nameField" promptText="Es. Le mie preferite" style="-fx-background-color: #f0f0f0; -fx-pref-height: 40; -fx-background-radius: 5;" />
+    </VBox>
+    
+    <VBox fx:id="generationCriteriaContainer" spacing="5.0">
+        <Label style="-fx-font-weight: bold;" text="Generazione Automatica (Opzionale):" />
+        <ComboBox fx:id="criterionComboBox" maxWidth="Infinity" style="-fx-background-color: #f0f0f0; -fx-pref-height: 40; -fx-background-radius: 5;" promptText="Seleziona filtro di generazione..." />
+    </VBox>
+
+    <VBox fx:id="automaticSelectionContainer" spacing="5.0" visible="false" managed="false">
+        <Label style="-fx-font-weight: bold;" text="Seleziona il valore presente in memoria:" />
+        <ComboBox fx:id="valueComboBox" maxWidth="Infinity" style="-fx-background-color: #f0f0f0; -fx-pref-height: 40; -fx-background-radius: 5;" promptText="Valore..." />
     </VBox>
     
     <Label fx:id="errorLabel" style="-fx-text-fill: red; -fx-font-size: 14;" visible="false" />

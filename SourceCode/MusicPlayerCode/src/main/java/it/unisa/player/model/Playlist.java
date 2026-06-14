@@ -9,7 +9,8 @@ import it.unisa.player.engine.Iterator;
 public class Playlist implements IterableCollection {
     private String name;
     // List Observable
-    private ObservableList<Track> tracks; 
+    private ObservableList<Track> tracks;
+    private int playCount = 0; // Traccia le riproduzioni dell'intera playlist
 
     public Playlist(String name) {
         this.name = name;
@@ -65,6 +66,20 @@ public class Playlist implements IterableCollection {
         return new ShuffleIterator(this.tracks, startIndex); 
     }
 
+    /**
+     * Restituisce il numero di riproduzioni avviate da questa playlist.
+     * @return Il contatore attuale.
+     */
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    /**
+     * Incrementa di uno il contatore delle riproduzioni della playlist.
+     */
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 
 
 }

@@ -1,4 +1,7 @@
 it\unisa\player\engine\PlaybackEngineTest.class
+it\unisa\player\command\LibraryUndoCommandTest.class
 it\unisa\player\model\PlaylistTest.class
 it\unisa\player\model\TrackTest.class
+it\unisa\player\strategy\AutoPlaylistStrategyTest.class
+it\unisa\player\command\PlaylistUndoTest.class
 it\unisa\player\model\LibraryTest.class

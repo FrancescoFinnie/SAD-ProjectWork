@@ -17,6 +17,7 @@ public class Track {
     private String genre;
     private int releaseYear;
     private List<String> tags;
+    private int playCount = 0;
 
   /**  Costruttore della classe Track. 
      * I parametri vengono validati tramite i rispettivi metodi setter.
@@ -38,15 +39,53 @@ public class Track {
     public String getGenre() { return genre; }
     public int getReleaseYear() { return releaseYear; }
 
-    // controllo del tag (se il tag è già presente non è possibile inserirlo di nuovo) per evitare tag duplicati
+
+    /**
+     * Aggiunge un tag alla traccia, evitando duplicati.
+     * @param tag Il tag da aggiungere.
+     */
     public void addTag(String tag) {
         if (!tags.contains(tag)) {
             tags.add(tag);
         }
     }
+    
+    /**
+     * Rimuove un tag specifico dalla traccia 
+     * @param tag Il tag da rimuovere.
+     * @return true se il tag era presente ed è stato rimosso, false altrimenti.
+     */
+    public boolean removeTag(String tag) {
+        return tags.remove(tag);
+    }
 
+    /**
+     * Verifica se la traccia possiede un determinato tag.
+     * @param tag Il tag da verificare.
+     * @return true se il tag è presente.
+     */
+    public boolean hasTag(String tag) {
+        return tags.contains(tag);
+    }
 
-    public List<String> getTags() { return tags; }
+    public List<String> getTags() { 
+        return tags; 
+    }
+
+    /**
+     * Restituisce il numero di riproduzioni della traccia 
+     * @return Il numero di ascolti.
+     */
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    /**
+     * Incrementa di uno il contatore delle riproduzioni
+     */
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 
 
     /** Imposta il titolo della traccia.

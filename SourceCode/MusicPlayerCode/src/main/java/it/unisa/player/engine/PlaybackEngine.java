@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import it.unisa.player.model.Track;
 import it.unisa.player.model.IterableCollection;
+import javafx.collections.ListChangeListener;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -39,6 +40,11 @@ public class PlaybackEngine {
     
     //Riferimento astratto alla collezione corrente (Libreria o Playlist)
     private IterableCollection currentCollection;
+    private Library globalLibrary;
+
+    public void setGlobalLibrary(Library globalLibrary) {
+        this.globalLibrary = globalLibrary;
+    }
 
     private PlaybackEngine() {
         this.queue = FXCollections.observableArrayList();
@@ -82,6 +88,55 @@ public class PlaybackEngine {
     public void pressPause() { this.getState().pause(this); }
     public void pressStop() { this.getState().stop(this); }
 
+    private ListChangeListener<Track> collectionListener;
+    private ObservableList<Track> currentObservedList;
+    
+    private void attachCollectionListener(ObservableList<Track> sourceList) {
+        // 1. Rimuove il vecchio listener se si passa a un'altra playlist/libreria
+        if (collectionListener != null && currentObservedList!= null) {
+            this.queue.removeListener(collectionListener);
+        }
+        currentObservedList = sourceList;
+
+        collectionListener = change -> {
+            while (change.next()) {
+                // Sincronizza la coda visiva della UI
+                queue.setAll(sourceList);
+                
+                // Trova il brano che sta suonando in questo istante
+                Track playing = currentTrack.get();
+                int newIndex = 0;
+                
+                if (playing != null) {
+                    newIndex = sourceList.indexOf(playing);
+                    if (newIndex < 0) newIndex = 0; // Se il brano corrente è stato rimosso, riparte da 0
+                }
+                
+                // Ricrea l'iteratore a caldo per non far saltare la musica in esecuzione
+                if (currentCollection != null) {
+                    Iterator newIter;
+                    if (isShuffleActive) {
+                        newIter = currentCollection.createShuffleIterator(newIndex);
+                    } else {
+                        newIter = currentCollection.createSequentialIterator(newIndex);
+                    }
+                    
+                    // Consuma il brano corrente per allineare l'iteratore alla traccia successiva
+                    if (newIter.hasNext() && sourceList.contains(playing)) {
+                        newIter.next();
+                    }
+                    
+                    setIterator(newIter);
+                    System.out.println("Coda aggiornata a runtime. Indice ricalcolato: " + newIndex);
+                }
+            }
+        };
+
+        // 2. Attacca il nuovo listener alla lista sorgente
+        if (sourceList != null) {
+            sourceList.addListener(collectionListener);
+        }
+    }
 
     // Avvio riproduzione da libreria.
     // Svuota/popola la queue, crea un SequentialIterator a partire dall'indice fornito e invoca la riproduzione.
@@ -89,9 +144,11 @@ public class PlaybackEngine {
         this.currentPlaylistContext = null; 
         this.currentCollection = library; // Salva la collezione corrente
 
-        this.queue.clear();
         if (library != null) {
-            this.queue.addAll(library.getAllTracks());
+            attachCollectionListener(library.getAllTracks());
+            this.queue.setAll(library.getAllTracks());
+        } else {
+            this.queue.clear();
         }
 
         if (library != null && !library.getAllTracks().isEmpty()) {
@@ -120,9 +177,11 @@ public class PlaybackEngine {
         this.currentPlaylistContext = playlist;
         this.currentCollection = playlist; // Salva la playlist come collezione corrente
 
-        this.queue.clear();
         if (playlist.getTracks() != null) {
-            this.queue.addAll(playlist.getTracks());
+            attachCollectionListener(playlist.getTracks());
+            this.queue.setAll(playlist.getTracks());
+        } else {
+            this.queue.clear();
         }
 
         if (playlist.getTracks() != null && !playlist.getTracks().isEmpty()) {
@@ -141,10 +200,14 @@ public class PlaybackEngine {
         this.iterator = newIterator;
     }
 
+    private boolean isShuffleActive = false;
+
     public void enableShuffle(boolean enable) {
         // Se non c'è una collezione attiva o la coda è vuota, si ferma
         if (currentCollection == null || queue.isEmpty()) return;
         
+        this.isShuffleActive = enable;
+
         // Trova l'indice del brano attuale guardando la coda della UI
         int currentIndex = queue.indexOf(getCurrentTrack());
         if (currentIndex < 0) currentIndex = 0;
@@ -181,8 +244,37 @@ public class PlaybackEngine {
     }
 
     public void skipToNextPlaylist() {
-        System.out.println("Playlist terminata! Tentativo di passare alla playlist successiva...");
-        this.pressStop();
+        System.out.println("Salto alla playlist successiva richiesto...");
+
+        if (globalLibrary == null || currentPlaylistContext == null) {
+            this.pressStop();
+            return;
+        }
+
+        //Recupera tutte le playlist e trova l'indice di quella attuale
+        ObservableList<Playlist> allPlaylists = globalLibrary.getPlaylists();
+        int currentIndex = allPlaylists.indexOf(currentPlaylistContext);
+
+        //Controllo se esiste una playlist successiva nell'elenco
+        if (currentIndex >= 0 && currentIndex < allPlaylists.size() - 1) {
+            
+            // Cambio sequenziale della playlist
+            Playlist nextPlaylist = allPlaylists.get(currentIndex + 1);
+            System.out.println("Passaggio automatico alla playlist: " + nextPlaylist.getName());
+            
+            // playFromPlaylist ferma la riproduzione, ricarica la lista, azzera l'indice a 0 e fa pressPlay()
+            this.playFromPlaylist(nextPlaylist, 0); 
+            
+        } else {
+            
+            // Termina la coda globale
+            System.out.println("Ultima playlist terminata. Arresto del motore.");
+            this.pressStop();            // Forza la transizione verso lo StoppedState
+            this.resetTimer();           // Azzera la progress bar e il timer (currentTimeProperty = 0)
+            this.currentTrack.set(null); // Svuota la UI
+            this.queue.clear();          // Svuota la coda visiva
+            this.currentPlaylistContext = null;
+        }
     }
 
     // Getters per JavaFX UI

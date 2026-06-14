@@ -2,6 +2,7 @@ package it.unisa.player.gui;
 
 import java.util.Optional;
 
+import it.unisa.player.command.CommandManager;
 import it.unisa.player.engine.PlaybackEngine;
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Track;
@@ -18,6 +19,9 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import it.unisa.player.command.Command;
+import it.unisa.player.command.RemoveTrackFromLibraryCommand;
+
 /**
  * Il Controller della libreria. Gestisce sia la schermata principale (tabella dei brani)
  * sia la schermata secondaria del form (inserimento e modifica).
@@ -33,6 +37,7 @@ public class LibraryController {
     //Riferimenti allo stato interno e alle dipendenze
     private Library library;
     private MainController mainController; 
+    private CommandManager commandManager;
 
     /**
      * Eseguito automaticamente da JavaFX non appena i file FXML vengono caricati.
@@ -50,9 +55,10 @@ public class LibraryController {
 
 
     //Riceve le istanze dei motori logici dalla classe App e aggiorna la tabella con i dati correnti della libreria
-    public void setDependencies(Library library, MainController mainController) {
+    public void setDependencies(Library library, MainController mainController, CommandManager commandManager) {
         this.library = library;
         this.mainController = mainController;
+        this.commandManager = commandManager;
 
         if (trackTable != null && library != null) {
             trackTable.setItems(library.getAllTracks());
@@ -83,14 +89,22 @@ private void setupTableInteractions() {
                         // Mostra l'alert e attende la risposta dell'utente (OK o ANNULLA)
                         Optional<ButtonType> result = alert.showAndWait();
                         
-                        // Se l'utente clicca su OK, procediamo all'eliminazione
-                        if (result.isPresent() && result.get() == ButtonType.OK) {
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
                             if (LibraryController.this.library != null) {
-                                LibraryController.this.library.removeTrack(track);
-                                System.out.println("Traccia eliminata con successo: " + track.getTitle());
+                                // MODIFICATO: Passa tramite il CommandManager per registrare l'azione nell'Undo
+                                if (LibraryController.this.commandManager != null) {
+                                    Command removeCmd = new RemoveTrackFromLibraryCommand(LibraryController.this.library, track);
+                                    LibraryController.this.commandManager.executeCommand(removeCmd);
+                                    
+                                    // Aggiorna istantaneamente la grafica della tabella
+                                    if (trackTable != null) {
+                                        trackTable.refresh();
+                                    }
+                                } else {
+                                    LibraryController.this.library.removeTrack(track);
+                                }
+                                System.out.println("Traccia eliminata con successo tramite Command: " + track.getTitle());
                             }
-                        } else {
-                            System.out.println("Eliminazione annullata dall'utente per il brano: " + track.getTitle());
                         }
                     });
                 }
@@ -130,7 +144,7 @@ private void setupTableInteractions() {
 
                                     TrackFormController formController = loader.getController();
                                     if (formController != null) {
-                                        formController.setDependencies(LibraryController.this.library, LibraryController.this.mainController);
+                                        formController.setDependencies(LibraryController.this.library, LibraryController.this.mainController, LibraryController.this.commandManager);
                                         formController.setTrackToEdit(selectedTrack);
                                     }
 
@@ -173,7 +187,7 @@ private void setupTableInteractions() {
             TrackFormController formController = loader.getController();
             
             if (formController != null) {
-                formController.setDependencies(this.library, this.mainController);
+                formController.setDependencies(this.library, this.mainController, this.commandManager);
             }
             if (this.mainController != null) {
                 this.mainController.setCenterView(view);
@@ -193,7 +207,7 @@ private void setupTableInteractions() {
             PlaylistController targetController = loader.getController();
             
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.mainController);
+                targetController.setDependencies(this.library, this.mainController, this.commandManager);
             }
             if (this.mainController != null) {
                 this.mainController.setCenterView(view);
@@ -207,7 +221,15 @@ private void setupTableInteractions() {
 
     @FXML
     public void onUndoClick() {
-        // Lasciamolo con un print per questo Sprint
-        System.out.println("Funzione Undo non disponibile in questa versione.");
+        if (commandManager != null) {
+            commandManager.undo(); // Esegue l'annullamento logico sul modello dei dati
+            
+            if (trackTable != null) {
+                trackTable.refresh(); 
+            }
+            System.out.println("Undo eseguito con successo. Interfaccia grafica della Libreria aggiornata.");
+        } else {
+            System.err.println("Impossibile eseguire l'Undo: CommandManager non iniettato.");
+        }
     }
 }

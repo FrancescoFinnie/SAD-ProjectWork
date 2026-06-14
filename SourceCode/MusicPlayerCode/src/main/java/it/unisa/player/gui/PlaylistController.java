@@ -2,6 +2,9 @@ package it.unisa.player.gui;
 
 import java.util.Optional;
 
+import it.unisa.player.command.Command;
+import it.unisa.player.command.CommandManager;
+import it.unisa.player.command.DeletePlaylistCommand;
 import it.unisa.player.engine.PlaybackEngine;
 import it.unisa.player.model.Library;
 import it.unisa.player.model.Playlist;
@@ -32,6 +35,7 @@ public class PlaylistController {
 
     private Library library;
     private MainController mainController;
+    private CommandManager commandManager;
 
     @FXML
     public void initialize() {
@@ -64,12 +68,13 @@ public class PlaylistController {
                         // Mostra l'alert e aspetta la risposta dell'utente
                         Optional<ButtonType> result = alert.showAndWait();
                         
-                        if (result.isPresent() && result.get() == ButtonType.OK) {
-                            if (library != null) {
-                                // Rimuove l'oggetto dal Model
-                                library.removePlaylist(playlist);
-                                System.out.println("Playlist eliminata: " + playlist.getName());
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                            if (PlaylistController.this.commandManager != null && PlaylistController.this.library != null) {
+                                // Instanzia ed esegue il comando di eliminazione totale
+                                Command deleteCmd = new DeletePlaylistCommand(PlaylistController.this.library, playlist);
+                                PlaylistController.this.commandManager.executeCommand(deleteCmd);
                                 
+                                playlistTable.refresh();
                             }
                         }
                     });
@@ -160,7 +165,7 @@ public class PlaylistController {
             PlaylistDetailController detailController = loader.getController();
             if (detailController != null) {
                 // Passiamo la libreria, la singola playlist cliccata e lo stage
-                detailController.setDependencies(this.library, this.mainController, targetPlaylist);
+                detailController.setDependencies(this.library, this.mainController, targetPlaylist, this.commandManager);
             }
             
             // Effettuiamo il cambio di scena
@@ -174,9 +179,10 @@ public class PlaylistController {
     }
 
     // Iniezione del MainController per delegare la navigazione centrale
-    public void setDependencies(Library library, MainController mainController) {
+    public void setDependencies(Library library, MainController mainController, CommandManager commandManager) {
         this.library = library;
         this.mainController = mainController;
+        this.commandManager = commandManager;
         // Popola la tabella con le playlist
         if (playlistTable != null && library != null) {
             playlistTable.setItems(library.getPlaylists());
@@ -192,7 +198,7 @@ public class PlaylistController {
             
             LibraryController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.mainController);
+                targetController.setDependencies(this.library, this.mainController, this.commandManager);
             }
             
             // REFACTORING TD2.4: Switch dinamico al centro del BorderPane globale
@@ -216,7 +222,7 @@ public class PlaylistController {
             PlaylistFormController formController = loader.getController();
             if (formController != null) {
                 // REFACTORING TD2.4: Inietto mainController
-                formController.setDependencies(this.library, this.mainController);
+                formController.setDependencies(this.library, this.mainController,this.commandManager);
             }
             
             // REFACTORING TD2.4: Switch dinamico al centro del BorderPane globale
@@ -241,7 +247,7 @@ public class PlaylistController {
             PlaylistFormController targetController = loader.getController();
             if (targetController != null) {
                 // REFACTORING TD2.4: Inietto mainController al posto dello Stage
-                targetController.setDependencies(this.library, playlist, this.mainController);
+                targetController.setDependencies(this.library, playlist, this.mainController,this.commandManager);
             }
 
             // REFACTORING TD2.4: Switch dinamico al centro del BorderPane globale
@@ -257,6 +263,13 @@ public class PlaylistController {
 
     @FXML
     public void onUndoClick() {
-        System.out.println("Undo non ancora implementato.");
+        if (commandManager != null) {
+            commandManager.undo(); // Annulla l'ultima azione 
+            
+            if (playlistTable != null) {
+                playlistTable.refresh(); 
+            }
+            System.out.println("Undo playlist completato con successo.");
+        }
     }
 }

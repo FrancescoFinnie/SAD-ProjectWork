@@ -9,6 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import it.unisa.player.command.AddTrackToLibraryCommand;
+import it.unisa.player.command.Command;
+import it.unisa.player.command.CommandManager;
 
 public class TrackFormController {
 
@@ -21,14 +24,16 @@ public class TrackFormController {
 
 private Library library;
     private MainController mainController;
+    private CommandManager commandManager; // Per eseguire comandi di modifica alla libreria
 
     //Tiene traccia del brano che si sta modificando (se null, allora stiamo inserendo)
     private Track trackToEdit = null;
 
     // Riceve le dipendenze necessarie per delegare la navigazione
-    public void setDependencies(Library library, MainController mainController) {
+    public void setDependencies(Library library, MainController mainController, CommandManager commandManager) {
         this.library = library;
         this.mainController = mainController;
+        this.commandManager = commandManager;
     }
 
     // Permette al LibraryController di passare la traccia da modificare
@@ -76,10 +81,16 @@ private Library library;
 
             // Decidiamo se siamo in modalità aggiunta o modifica in base alla presenza di trackToEdit
             if (trackToEdit == null) {
-                // Modalità aggiunta: il costruttore invocherà i setter, validando i dati in tempo reale
+                // Modalità aggiunta: crea l'istanza convalidata dal Modello
                 Track newTrack = new Track(title, author, duration, genre, year);
-                library.addTrack(newTrack);
-                System.out.println("Traccia aggiunta con successo!");
+                
+                if (this.commandManager != null) {
+                    Command addCmd = new AddTrackToLibraryCommand(this.library, newTrack);
+                    this.commandManager.executeCommand(addCmd);
+                } else {
+                    this.library.addTrack(newTrack);
+                }
+                System.out.println("Traccia aggiunta con successo tramite Command!");
             } else {
                 // Modalità modifica: l'assegnamento passa dai setter che solleveranno eccezioni in caso di input non validi
                 trackToEdit.setTitle(title);
@@ -133,7 +144,7 @@ private Library library;
             // Recuperiamo il controller e gli passiamo il mainController
             LibraryController nextController = loader.getController();
             if (nextController != null) {
-                nextController.setDependencies(this.library, this.mainController);
+                nextController.setDependencies(this.library, this.mainController, this.commandManager);
             }
 
             // Deleghiamo il cambio scena al MainController senza ricaricare tutta la finestra

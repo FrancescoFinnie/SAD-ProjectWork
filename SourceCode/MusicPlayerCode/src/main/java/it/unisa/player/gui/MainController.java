@@ -51,7 +51,8 @@ public class MainController {
     private Button shuffleButton;
     @FXML
     private Button loopButton;
-
+    @FXML
+    private Button skipPlaylistButton;
 /**
      * Metodo di inizializzazione invocato automaticamente da JavaFX al caricamento del file FXML.
      */
@@ -121,6 +122,12 @@ public class MainController {
         if (timeTotalLabel != null) timeTotalLabel.setText("00:00");
     }
 
+    public void setLibrary(it.unisa.player.model.Library library){
+        if (this.engine != null) {
+            this.engine.setGlobalLibrary(library);
+        }
+    }
+
     /**
      * Imposta dinamicamente il contenuto della regione centrale del layout globale.
      * Questo costrutto permette di navigare tra le diverse viste dell'applicazione 
@@ -156,6 +163,10 @@ public class MainController {
     @FXML
     private void handleSkipClick() {
         engine.playNext();
+    }
+    @FXML
+    private void handleSkipPlaylistClick() {
+        engine.skipToNextPlaylist();
     }
 
     // Variabile booleana per tenere traccia dello stato (acceso/spento)

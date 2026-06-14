@@ -7,11 +7,19 @@ import it.unisa.player.engine.PlaybackEngine;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+
+import java.util.Optional;
+
+import it.unisa.player.command.Command;
+import it.unisa.player.command.CommandManager;
+import it.unisa.player.command.RemoveTrackFromPlaylistCommand;
 
 public class PlaylistDetailController {
 
@@ -24,6 +32,7 @@ public class PlaylistDetailController {
     private Library library;
     private Playlist currentPlaylist; // Mantiene lo stato: quale playlist stiamo visualizzando
     private MainController mainController;
+    private CommandManager commandManager; // Per eseguire comandi di modifica alla playlist
 
    /**
      * Metodo di inizializzazione nativo di JavaFX.
@@ -49,13 +58,28 @@ public class PlaylistDetailController {
                     
                     
                     deleteBtn.setOnAction(event -> {
-                        // 1. Recupera l'oggetto Track associato alla riga cliccata
                         Track trackToRemove = getTableView().getItems().get(getIndex());
                         
-                        // 2. Invoca direttamente il metodo di eliminazione sulla playlist in memoria
-                        if (currentPlaylist != null) {
-                            currentPlaylist.removeTrack(trackToRemove);
-                            // La UI si aggiornerà istantaneamente da sola grazie all'ObservableList
+                        if (PlaylistDetailController.this.currentPlaylist != null) {
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Conferma Rimozione");
+                            alert.setHeaderText("Rimuovere il brano dalla playlist?");
+                            alert.setContentText("Sei sicuro di voler rimuovere \"" + trackToRemove.getTitle() + "\" da questa playlist?");
+                            
+                            Optional<ButtonType> result = alert.showAndWait();
+                            // Se il CommandManager è disponibile, eseguiamo l'azione tramite Command (Task 25.1)
+                            if (PlaylistDetailController.this.commandManager != null) {
+                                Command removeCmd = new RemoveTrackFromPlaylistCommand(PlaylistDetailController.this.currentPlaylist, trackToRemove);
+                                PlaylistDetailController.this.commandManager.executeCommand(removeCmd);
+                                
+                                // Forza il refresh grafico per sicurezza
+                                if (trackTable != null) {
+                                    trackTable.refresh();
+                                }
+                            } else {
+                                // Fallback di sicurezza
+                                PlaylistDetailController.this.currentPlaylist.removeTrack(trackToRemove);
+                            }
                         }
                     });
                 }
@@ -88,10 +112,11 @@ public class PlaylistDetailController {
     /**
      * Dependency Injection: passiamo al controller tutto ciò di cui ha bisogno per operare.
      */
-    public void setDependencies(Library library, MainController mainController, Playlist playlist) {
+    public void setDependencies(Library library, MainController mainController, Playlist playlist, CommandManager commandManager) {
         this.library = library;
         this.currentPlaylist = playlist;
         this.mainController = mainController;
+        this.commandManager = commandManager;
 
         if (this.currentPlaylist != null) {
             // Aggiorniamo la View
@@ -117,7 +142,7 @@ public class PlaylistDetailController {
             // Dobbiamo ri-iniettare le dipendenze nel controller principale
             PlaylistController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.mainController);
+                targetController.setDependencies(this.library, this.mainController,this.commandManager);
             }
             
             // REFACTORING TD2.4: Deleghiamo il cambio scena alla vista centrale del MainController
@@ -156,7 +181,7 @@ public class PlaylistDetailController {
             // e la "destinazione" (currentPlaylist) su cui dovrà applicare l'aggiunta del brano.
             SelectTrackController controller = loader.getController();
             if (controller != null) {
-                controller.setDependencies(this.library, this.currentPlaylist, dialogStage);
+                controller.setDependencies(this.library, this.currentPlaylist, dialogStage, this.commandManager);
             }
 
             // 4. Mostra la finestra a schermo e sospende l'esecuzione di questo metodo
@@ -190,4 +215,21 @@ public class PlaylistDetailController {
         PlaybackEngine.getInstance().playFromPlaylist(currentPlaylist, startIndex);
     }
 
+    /**
+ * Metodo collegato al pulsante "Undo" della UI di dettaglio.
+ * Ripristina la traccia eliminata o rimuove la traccia aggiunta, aggiornando la grafica.
+ */
+    @FXML
+    public void onUndoClick() {
+        if (commandManager != null) {
+            commandManager.undo(); 
+            
+            if (trackTable != null) {
+                trackTable.refresh(); 
+            }
+            System.out.println("Undo eseguito con successo nel dettaglio della playlist.");
+        } else {
+            System.err.println("Impossibile eseguire l'Undo: CommandManager non iniettato.");
+        }
+    }
 }

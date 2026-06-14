@@ -39,9 +39,9 @@ public class Library implements IterableCollection {
 
     // Inizializzazione con dati di prova
     public void loadSampleData() {
-        Track t1 = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
-        Track t2 = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971);
-        Track t3 = new Track("Hotel California", "Eagles", 390, "Rock", 1976);
+        Track t1 = new Track("Hello", "Adele", 10, "pop", 1975);
+        Track t2 = new Track("Sotto Casa", "Max Gazzè", 15, "pop", 1971);
+        Track t3 = new Track("Born this way", "Lady Gaga", 10, "pop", 1976);
 
         tracks.add(t1);
         tracks.add(t2);

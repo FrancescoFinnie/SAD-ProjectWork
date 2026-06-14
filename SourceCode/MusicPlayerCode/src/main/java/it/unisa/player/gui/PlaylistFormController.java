@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import it.unisa.player.command.CommandManager;
 
 public class PlaylistFormController {
 
@@ -19,23 +20,25 @@ public class PlaylistFormController {
 
     private Library library;
     private MainController mainController;
+    private CommandManager commandManager; // Per eseguire comandi di modifica alla libreria
 
     private Playlist playlistToEdit;
 
 /**
      * Iniezione dipendenze per CREAZIONE (Aggiungi Playlist).
      */
-    public void setDependencies(Library library, MainController mainController) {
-        setDependencies(library, null, mainController); // Richiama il metodo sottostante passando null
+    public void setDependencies(Library library, MainController mainController, CommandManager commandManager) {
+        setDependencies(library, null, mainController,commandManager); // Richiama il metodo sottostante passando null
     }
 
     /**
      * Iniezione dipendenze principale (Supporta sia Creazione che Modifica).
      */
-    public void setDependencies(Library library, Playlist playlistToEdit, MainController mainController) {
+    public void setDependencies(Library library, Playlist playlistToEdit, MainController mainController, CommandManager commandManager) {
         this.library = library;
         this.playlistToEdit = playlistToEdit;
         this.mainController = mainController;
+        this.commandManager = commandManager;
 
         if (this.playlistToEdit != null) {
             // --- MODALITÀ MODIFICA ---
@@ -88,8 +91,16 @@ public class PlaylistFormController {
                 library.getPlaylists().set(index, playlistToEdit); // Forza refresh UI
             }
         } else {
-            // Creazione (US7)
-            library.addPlaylist(new Playlist(name)); // Sappiamo già che avrà successo
+            Playlist newPlaylist = new Playlist(name);
+            
+            if (this.commandManager != null && this.library != null) {
+                // Istanziamo ed eseguiamo il comando tramite CommandManager per supportare l'Undo
+                it.unisa.player.command.Command createCmd = new it.unisa.player.command.CreatePlaylistCommand(this.library, newPlaylist);
+                this.commandManager.executeCommand(createCmd);
+                System.out.println("Playlist creata con successo tramite CreatePlaylistCommand!");
+            } else {
+                library.addPlaylist(newPlaylist);
+            }
         }
 
         // --- 3. CONCLUSIONE ---
@@ -108,7 +119,7 @@ public class PlaylistFormController {
             
             PlaylistController targetController = loader.getController();
             if (targetController != null) {
-                targetController.setDependencies(this.library, this.mainController);
+                targetController.setDependencies(this.library, this.mainController,this.commandManager);
             }
             
 

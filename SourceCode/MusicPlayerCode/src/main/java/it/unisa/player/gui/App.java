@@ -1,5 +1,6 @@
 package it.unisa.player.gui;
 
+import it.unisa.player.command.CommandManager;
 import it.unisa.player.model.Library;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,8 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         // Istanziamo la libreria musicale.
         Library library = new Library();
+        // Istanziamo il CommandManager globale che gestirà tutte le operazioni di Undo/Redo.
+        CommandManager commandManager = new CommandManager();
 
         // Carichiamo dei brani fittizi per evitare che l'applicazione si apra completamente vuota
         library.loadSampleData();
@@ -38,7 +41,7 @@ public class App extends Application {
         // 3. Inietta il mainController al posto dello Stage
         LibraryController libController = libLoader.getController();
         if (libController != null) {
-            libController.setDependencies(library, mainController);
+            libController.setDependencies(library, mainController, commandManager);
         }
 
         // 4. Incastra la libreria al centro del Layout Globale

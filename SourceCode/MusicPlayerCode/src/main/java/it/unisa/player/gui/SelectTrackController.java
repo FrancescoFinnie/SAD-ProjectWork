@@ -9,6 +9,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import it.unisa.player.command.Command;
+import it.unisa.player.command.CommandManager;
+import it.unisa.player.command.AddTrackToPlaylistCommand;
 
 /**
  *
@@ -26,7 +29,8 @@ public class SelectTrackController {
 
     private Library library;
     private Playlist destinationPlaylist;
-    private Stage dialogStage;
+private Stage dialogStage;
+    private CommandManager commandManager;
 
     /**
      * Metodo di inizializzazione nativo di JavaFX.
@@ -45,10 +49,11 @@ public class SelectTrackController {
      * @param destinationPlaylist La playlist in cui l'utente vuole inserire il brano.
      * @param dialogStage L'oggetto Stage (finestra) corrente, necessario per poterlo chiudere.
      */
-    public void setDependencies(Library library, Playlist destinationPlaylist, Stage dialogStage) {
+    public void setDependencies(Library library, Playlist destinationPlaylist, Stage dialogStage, CommandManager commandManager) {
         this.library = library;
         this.destinationPlaylist = destinationPlaylist;
         this.dialogStage = dialogStage;
+        this.commandManager = commandManager;
         
         // Popoliamo la tabella attingendo direttamente dalla libreria globale.
         // Utilizziamo getAllTracks() come definito nel Model della Library.
@@ -61,30 +66,41 @@ public class SelectTrackController {
      * Gestisce l'evento di click sul pulsante "Aggiungi".
      * Estrae la traccia selezionata e invoca la logica di business anti-duplicati del Model.
      */
+
+/**
+     * Gestisce l'evento di click sul pulsante "Aggiungi".
+     * Esegue l'inserimento mediante il pattern Command per permettere il rollback (Undo).
+     */
     @FXML
     public void onAddClick() {
-        // 1. Recupero della traccia evidenziata dall'utente nella tabella
+        // Recupero della traccia evidenziata dall'utente nella tabella
         Track selectedTrack = globalTracksTable.getSelectionModel().getSelectedItem();
 
-        // 2. Validazione dell'input: l'utente ha effettivamente cliccato su una riga?
+        // Validazione dell'input: l'utente ha effettivamente cliccato su una riga?
         if (selectedTrack == null) {
             showError("Attenzione: Seleziona un brano dalla lista prima di procedere.");
             return;
         }
 
-        // 3. Invocazione del Model: deleghiamo alla Playlist il controllo logico e l'inserimento
-        boolean success = destinationPlaylist.addTrack(selectedTrack);
-
-        // 4. Gestione dell'esito
-        if (success) {
-            // L'inserimento ha avuto successo. Grazie al pattern ObservableList, 
-            // la tabella della playlist sottostante si aggiornerà in tempo reale.
-            // Chiudiamo semplicemente il popup modale.
-            dialogStage.close(); 
-        } else {
-            // L'inserimento è fallito (il Model ha rilevato una violazione della regola sui duplicati)
+        // Controllo preventivo anti-duplicati 
+        if (destinationPlaylist.getTracks().contains(selectedTrack)) {
             showError("Impossibile procedere: Il brano è già presente in questa playlist.");
+            return;
         }
+
+        // Invocazione ed esecuzione guidata dal Pattern Command
+        if (this.commandManager != null) {
+            // Istanziamo ed eseguiamo il comando posizionale 
+            Command addCmd = new AddTrackToPlaylistCommand(this.destinationPlaylist, selectedTrack);
+            this.commandManager.executeCommand(addCmd);
+            System.out.println("Traccia aggiunta alla playlist tramite AddTrackToPlaylistCommand!");
+        } else {
+            // Fallback di sicurezza se il gestore non è configurato
+            destinationPlaylist.addTrack(selectedTrack);
+        }
+
+        // Chiusura del popup modale 
+        dialogStage.close(); 
     }
 
     /**

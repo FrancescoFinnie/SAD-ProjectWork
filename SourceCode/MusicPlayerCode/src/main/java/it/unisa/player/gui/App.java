@@ -33,6 +33,7 @@ public class App extends Application {
         Parent root = mainLoader.load();
 
         MainController mainController = mainLoader.getController();
+        mainController.setLibrary(library);
 
         // 2. Carica la vista iniziale (Libreria)
         FXMLLoader libLoader = new FXMLLoader(getClass().getResource(ViewConstants.LIBRARY_VIEW));

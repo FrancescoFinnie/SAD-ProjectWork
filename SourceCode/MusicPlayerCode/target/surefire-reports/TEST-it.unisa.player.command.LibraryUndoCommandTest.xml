@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="it.unisa.player.command.LibraryUndoCommandTest" time="0.154" tests="2" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="16"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\test-classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\edoar\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="Europe/Rome"/>
+    <property name="os.name" value="Windows 10"/>
+    <property name="java.vm.specification.version" value="16"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="IT"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-16.0.2\bin"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\edoar\AppData\Local\Temp\surefire3738298349275715957 2026-06-14T19-10-23_941-jvmRun1 surefire-20260614191025188_1tmp surefire_0-20260614191025188_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\test-classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\edoar\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\edoar"/>
+    <property name="user.language" value="it"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="jdk.module.path" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13-win.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13-win.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13-win.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13-win.jar"/>
+    <property name="java.version.date" value="2021-07-20"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-16.0.2"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-booter\3.5.4\surefire-booter-3.5.4.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-api\3.5.4\surefire-api-3.5.4.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.5.4\surefire-extensions-spi-3.5.4.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.5.4\surefire-shared-utils-3.5.4.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.5.4\surefire-logger-api-3.5.4.jar;C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode\target\test-classes;C:\Users\edoar\.m2\repository\org\openjfx\javafx-controls\13\javafx-controls-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-graphics\13\javafx-graphics-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-base\13\javafx-base-13.jar;C:\Users\edoar\.m2\repository\org\openjfx\javafx-fxml\13\javafx-fxml-13.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\edoar\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\edoar\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\surefire-junit-platform\3.5.4\surefire-junit-platform-3.5.4.jar;C:\Users\edoar\.m2\repository\org\apache\maven\surefire\common-java5\3.5.4\common-java5-3.5.4.jar;C:\Users\edoar\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="16.0.2+7-67"/>
+    <property name="user.name" value="edoar"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="Cp1252"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="C:\Users\edoar\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\edoar\AppData\Local\Temp\"/>
+    <property name="java.version" value="16.0.2"/>
+    <property name="user.dir" value="C:\Users\edoar\Desktop\Software\PROGETTO\git_official\SAD-ProjectWork\SourceCode\MusicPlayerCode"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-16.0.2\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;c:\Users\edoar\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;c:\Users\edoar\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\copilotCli;C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot\bin;C:\Python313\Scripts\;C:\Python313\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;&quot;;C:\cygwin64\bin&quot;;C:\Program Files\Java\jdk-15.0.1\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files\MATLAB\R2025b\bin;C:\apache-maven-3.9.16\bin;C:\Users\edoar\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\edoar\AppData\Local\Programs\Python\Python313\;C:\Users\edoar\AppData\Local\Programs\Python\Launcher\;C:\Users\edoar\AppData\Local\Microsoft\WindowsApps;C:\Users\edoar\AppData\Roaming\Dashlane\5.15.1.22107\bin\Firefox_Extension\{442718d9-475e-452a-b3e1-fb1ee16b8e9f}\components;C:\Users\edoar\AppData\Roaming\Dashlane\5.15.1.22107\ucrt;C:\Users\edoar\AppData\Local\atom\bin;C:\Users\edoar\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\JetBrains\PyCharm 2024.3.3\bin;;C:\Users\edoar\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\edoar\AppData\Roaming\npm;c:\Users\edoar\.vscode\extensions\vscjava.vscode-java-debug-0.59.0\bundled\scripts\noConfigScripts;."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="16.0.2+7-67"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="60.0"/>
+  </properties>
+  <testcase name="testUndoRemoveTrackPreservesOriginalIndex" classname="it.unisa.player.command.LibraryUndoCommandTest" time="0.101"/>
+  <testcase name="testUndoAddTrackRemovesIt" classname="it.unisa.player.command.LibraryUndoCommandTest" time="0.008"/>
+</testsuite>

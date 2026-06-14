@@ -23,9 +23,10 @@
 
 <TableView fx:id="trackTable" style="-fx-background-radius: 10;" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="titleColumn" prefWidth="130.0" text="Titolo" />
-            <TableColumn fx:id="authorColumn" prefWidth="162.4000244140625" text="Autore" />
-            <TableColumn fx:id="deleteColumn" prefWidth="66.39996337890625" resizable="false" style="-fx-alignment: CENTER-RIGHT; -fx-padding: 0 10 0 0;" text="" />
+            <TableColumn fx:id="titleColumn" prefWidth="120.0" text="Titolo" />
+            <TableColumn fx:id="authorColumn" prefWidth="120" text="Autore" />
+            <TableColumn fx:id="tagsColumn" text="Tag" minWidth="60" prefWidth="80" resizable="true" sortable="false"/>
+            <TableColumn fx:id="deleteColumn" prefWidth="60" resizable="false" style="-fx-alignment: CENTER-RIGHT; -fx-padding: 0 10 0 0;" text="" />
         </columns>
     </TableView>
 

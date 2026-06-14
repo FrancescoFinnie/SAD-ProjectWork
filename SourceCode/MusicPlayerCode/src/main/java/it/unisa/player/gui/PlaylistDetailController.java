@@ -67,7 +67,7 @@ public class PlaylistDetailController {
                             alert.setContentText("Sei sicuro di voler rimuovere \"" + trackToRemove.getTitle() + "\" da questa playlist?");
                             
                             Optional<ButtonType> result = alert.showAndWait();
-                            // Se il CommandManager è disponibile, eseguiamo l'azione tramite Command (Task 25.1)
+                            // Se il CommandManager è disponibile, eseguiamo l'azione tramite Command
                             if (PlaylistDetailController.this.commandManager != null) {
                                 Command removeCmd = new RemoveTrackFromPlaylistCommand(PlaylistDetailController.this.currentPlaylist, trackToRemove);
                                 PlaylistDetailController.this.commandManager.executeCommand(removeCmd);

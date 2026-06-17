@@ -39,16 +39,18 @@ public class Library implements IterableCollection {
 
     // Inizializzazione con dati di prova
     public void loadSampleData() {
-        Track t1 = new Track("Hello", "Adele", 10, "pop", 1975);
-        Track t2 = new Track("Sotto Casa", "Max Gazzè", 15, "pop", 1971);
-        Track t3 = new Track("Born this way", "Lady Gaga", 10, "pop", 1976);
+        Track t1 = new Track("Seven Nation Army", "The White Stripes", 10, "pop", 2003);
+        Track t2 = new Track("Waivin' Flag", "K'naan", 221, "reggae", 2009);
+        Track t3 = new Track("Dai dai", "Shakira, Burna Boy", 240, "reggae", 2026);
 
         tracks.add(t1);
         tracks.add(t2);
         tracks.add(t3);
+        
 
-        Playlist p1 = new Playlist("Classici Rock");
+        Playlist p1 = new Playlist("Messico-USA-Canada 2026");
         playlists.add(p1);
+        p1.addTrack(t3);
 
     }
 
